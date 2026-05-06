@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Test · Resumen Ejecutivo</title>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 1100px; margin: 30px auto; padding: 20px; background: #F8F6F0; color: #1A2F4A; }
+  h1 { font-size: 22px; margin-bottom: 8px; }
+  .info { background: white; padding: 14px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #2C7A5A; font-size: 13px; }
+  .info b { color: #2C7A5A; }
+  table { background: white; border-collapse: collapse; width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  th, td { padding: 8px 10px; border: 1px solid #E8E4D8; text-align: left; font-size: 12px; }
+  th { background: #1A2F4A; color: white; font-size: 11px; }
+  .loading { text-align: center; padding: 40px; color: #888; }
+  .error { background: #FEE; color: #A32D2D; padding: 14px; border-radius: 6px; }
+  pre { background: #f5f5f5; padding: 8px; overflow-x: auto; font-size: 11px; max-height: 200px; }
+</style>
+</head>
+<body>
+
+<h1>🧪 Test: Lectura Hoja "Resumen Ejecutivo"</h1>
+<div class="info">
+  <b>Probando:</b> conexión al Google Sheet del diagnóstico final<br>
+  <b>URL:</b> <code style="font-size: 10px;">...QjGSiz3g...</code>
+</div>
+
+<div id="status" class="loading">⏳ Cargando datos del Sheet...</div>
+<div id="result"></div>
+
+<script>
+const URL_RESUMEN = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQjGSiz3gMFyudvmpNzm0ydUwSnEmK1BwOowSNRgRrpjQkzsvvMbj1IkVh6XIHPEg/pub?output=csv';
+
+async function test() {
+  const status = document.getElementById('status');
+  const result = document.getElementById('result');
+
+  try {
+    const res = await fetch(URL_RESUMEN);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const csv = await res.text();
+    const parsed = Papa.parse(csv, { skipEmptyLines: true });
+
+    status.innerHTML = `✅ <b>Lectura OK</b> · ${parsed.data.length} filas detectadas`;
+    status.style.background = '#E8F5E9';
+    status.style.color = '#2C7A5A';
+    status.style.padding = '14px';
+    status.style.borderRadius = '6px';
+
+    // Mostrar tabla
+    let html = '<h3 style="margin: 20px 0 10px;">📋 Vista de los datos crudos:</h3><table>';
+    parsed.data.forEach((row, i) => {
+      html += '<tr>';
+      row.forEach(cell => {
+        const tag = i === 0 ? 'th' : 'td';
+        html += `<${tag}>${cell || ''}</${tag}>`;
+      });
+      html += '</tr>';
+    });
+    html += '</table>';
+
+    result.innerHTML = html;
+
+  } catch (err) {
+    status.className = 'error';
+    status.innerHTML = `<b>❌ Error:</b> ${err.message}<br><br>
+      Posibles causas:<br>
+      1. La hoja no está publicada como CSV<br>
+      2. La URL está mal copiada<br>
+      3. CORS bloqueado (solo pasa al abrir local con doble-click — en GitHub Pages funciona)`;
+  }
+}
+
+test();
+</script>
+</body>
+</html>
