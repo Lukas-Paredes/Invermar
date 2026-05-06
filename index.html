@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INVERMAR · Dashboard Demo</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<style>
+  :root {
+    --navy: #1A2F4A; --navy-dark: #0F1E33;
+    --cream: #F8F6F0; --cream-2: #FAF8F2;
+    --text-gray: #5F5E5A; --text-mute: #9A9A95;
+    --green: #2C7A5A; --orange: #C54A2A;
+    --border: #D8D4C8;
+    --shadow: 0 1px 3px rgba(26,47,74,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream); color: var(--navy);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .topbar {
+    background: var(--navy-dark); color: var(--cream-2);
+    padding: 18px 28px;
+    border-bottom: 3px solid var(--green);
+  }
+  .topbar h1 { font-size: 18px; font-weight: 600; }
+  .topbar p {
+    font-size: 11px; color: #8FA3BD; margin-top: 4px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .topbar .badge {
+    display: inline-block; background: rgba(44, 122, 90, 0.25);
+    color: #7AC4A0; padding: 3px 10px; border-radius: 12px;
+    font-size: 10px; margin-top: 6px;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 28px; }
+
+  .info-banner {
+    background: white; border-left: 4px solid var(--green);
+    padding: 14px 18px; border-radius: 0 6px 6px 0;
+    margin-bottom: 24px; box-shadow: var(--shadow);
+    font-size: 13px;
+  }
+  .info-banner b { color: var(--green); }
+  .info-banner .last-update {
+    color: var(--text-mute); font-size: 11px; margin-top: 4px;
+  }
+
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin-bottom: 24px;
+  }
+  .kpi {
+    background: white; padding: 18px 20px;
+    border-radius: 8px; border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    position: relative; overflow: hidden;
+  }
+  .kpi::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--navy);
+  }
+  .kpi.green::before { background: var(--green); }
+  .kpi.orange::before { background: var(--orange); }
+  .kpi-label {
+    font-size: 10px; color: var(--text-mute);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-size: 32px; font-weight: 700; color: var(--navy);
+    line-height: 1.1; font-family: Georgia, serif;
+  }
+  .kpi.green .kpi-value { color: var(--green); }
+  .kpi.orange .kpi-value { color: var(--orange); }
+  .kpi-sub {
+    font-size: 11px; color: var(--text-gray); margin-top: 6px;
+  }
+
+  .grid-2 {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-bottom: 14px;
+  }
+  @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: white; padding: 18px 20px;
+    border-radius: 8px; border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600; color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .card-sub {
+    font-size: 11px; color: var(--text-mute); margin-bottom: 14px;
+  }
+  .chart-box { position: relative; height: 280px; }
+
+  .loading {
+    text-align: center; padding: 60px 20px;
+    color: var(--text-mute); font-size: 14px;
+  }
+  .loading::before { content: '⏳ '; }
+  .error {
+    text-align: center; padding: 30px 20px;
+    color: var(--orange); font-size: 13px;
+    background: rgba(197,74,42,0.05);
+    border-radius: 8px; border: 1px solid rgba(197,74,42,0.2);
+    line-height: 1.6;
+  }
+  .error code {
+    background: rgba(0,0,0,0.05); padding: 2px 6px;
+    border-radius: 3px; font-size: 11px;
+  }
+
+  table { width: 100%; font-size: 12px; border-collapse: collapse; }
+  th {
+    text-align: left; padding: 8px 10px;
+    background: #F1EEE3; color: var(--text-gray);
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #E8E4D8;
+  }
+  td.num {
+    text-align: right; font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+
+  .footer {
+    text-align: center; padding: 24px;
+    color: var(--text-mute); font-size: 11px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>INVERMAR · Dashboard Demo</h1>
+  <p>Inversión social comunitaria · Datos en vivo desde Google Sheets</p>
+  <span class="badge">● PRUEBA · Actualización automática</span>
+</div>
+
+<div class="container">
+
+  <div class="info-banner">
+    <b>📡 Datos en vivo:</b> esta página se actualiza automáticamente cuando alguien edita el Google Sheet. Los cambios pueden demorar hasta 5 minutos en reflejarse por el cache de Google.
+    <div class="last-update">Última carga del dashboard: <span id="last-update">cargando...</span></div>
+  </div>
+
+  <div id="content" class="loading">Cargando datos desde Google Sheets...</div>
+
+</div>
+
+<div class="footer">
+  Dashboard demo · Datos del Consolidado Power BI · Actualizado en vivo desde Google Sheets
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// ⚙️ CONFIGURACIÓN — REEMPLAZÁ ESTA URL
+// ════════════════════════════════════════════════════════════
+//
+// Pegá acá la URL del CSV publicado de tu Google Sheet.
+//
+// Para obtenerla:
+//   1. Abre el Sheet en Google Drive
+//   2. Archivo → Compartir → Publicar en la web
+//   3. Tipo: "Valores separados por comas (.csv)"
+//   4. Click "Publicar" → Copia la URL
+//   5. Pegala acá abajo entre las comillas
+//
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3Ut01K8QGBbQOELVydHp0MWGs1FAm8a7l3Vtp-3YjwdwLtMNSjf4kBkSRHPFWdmRRXuNsv1jocdM-/pub?output=csv';
+//
+// ════════════════════════════════════════════════════════════
+
+const COLORS = {
+  navy: '#1A2F4A', green: '#2C7A5A', orange: '#C54A2A',
+  gray: '#9A9A95', border: '#D8D4C8'
+};
+
+const fmtCLP = n =>
+  n >= 1e6 ? '$' + (n/1e6).toFixed(1) + 'M' :
+  n >= 1e3 ? '$' + (n/1e3).toFixed(0) + 'K' :
+  '$' + Math.round(n);
+
+async function loadData() {
+  const content = document.getElementById('content');
+  const updateEl = document.getElementById('last-update');
+
+  if (SHEET_CSV_URL.includes('REEMPLAZAR_AQUI')) {
+    content.className = 'error';
+    content.innerHTML = `
+      <b>⚙️ Configuración pendiente</b><br><br>
+      Edita el archivo <code>index.html</code> y reemplaza la variable
+      <code>SHEET_CSV_URL</code> con la URL de tu Google Sheet publicado como CSV.<br><br>
+      Mira las instrucciones en los comentarios del archivo.
+    `;
+    return;
+  }
+
+  try {
+    const response = await fetch(SHEET_CSV_URL);
+    if (!response.ok) throw new Error('No se pudo cargar el Google Sheet (HTTP ' + response.status + ')');
+    const csv = await response.text();
+    const parsed = Papa.parse(csv, {
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true
+    });
+    const rows = parsed.data.filter(r =>
+      r.Comunidad_Organización && r.Sector
+    );
+
+    if (rows.length === 0) {
+      throw new Error('El Sheet no tiene datos válidos. Verifica las columnas requeridas.');
+    }
+
+    updateEl.textContent = new Date().toLocaleString('es-CL');
+    renderDashboard(rows);
+  } catch (err) {
+    console.error(err);
+    content.className = 'error';
+    content.innerHTML = `
+      <b>⚠️ No se pudieron cargar los datos</b><br><br>
+      Error: <code>${err.message}</code><br><br>
+      Verificá que:<br>
+      1. El Google Sheet esté <b>publicado en la web como CSV</b><br>
+      2. La URL <code>SHEET_CSV_URL</code> esté correctamente configurada<br>
+      3. Las columnas requeridas estén presentes:
+      <code>Año, Sector, Tipo_Organización, Comunidad_Organización, Monto_Total, Beneficiarios, Estatus</code>
+    `;
+  }
+}
+
+function renderDashboard(rows) {
+  const content = document.getElementById('content');
+
+  // ═══ CÁLCULOS ═══
+  const totalMonto = rows.reduce((s, r) => s + (Number(r.Monto_Total) || 0), 0);
+  const totalBenef = rows.reduce((s, r) => s + (Number(r.Beneficiarios) || 0), 0);
+  const orgs = new Set(rows.map(r => r.Comunidad_Organización));
+  const sectores = new Set(rows.map(r => r.Sector));
+
+  const porAño = {};
+  rows.forEach(r => {
+    const y = r.Año;
+    if (!y) return;
+    porAño[y] = (porAño[y] || 0) + (Number(r.Monto_Total) || 0);
+  });
+
+  const porSector = {};
+  rows.forEach(r => {
+    porSector[r.Sector] = (porSector[r.Sector] || 0) + (Number(r.Monto_Total) || 0);
+  });
+  const sectoresOrdenados = Object.entries(porSector)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, 8);
+
+  const porTipo = {};
+  rows.forEach(r => {
+    if (!r.Tipo_Organización) return;
+    porTipo[r.Tipo_Organización] = (porTipo[r.Tipo_Organización] || 0) + (Number(r.Monto_Total) || 0);
+  });
+  const tiposOrdenados = Object.entries(porTipo).sort((a,b) => b[1] - a[1]);
+
+  // Top organizaciones
+  const orgTotal = {};
+  rows.forEach(r => {
+    const key = r.Comunidad_Organización;
+    orgTotal[key] = orgTotal[key] || { monto: 0, sector: r.Sector, tipo: r.Tipo_Organización, count: 0 };
+    orgTotal[key].monto += (Number(r.Monto_Total) || 0);
+    orgTotal[key].count++;
+  });
+  const topOrgs = Object.entries(orgTotal)
+    .sort((a,b) => b[1].monto - a[1].monto)
+    .slice(0, 10);
+
+  // ═══ HTML DEL DASHBOARD ═══
+  content.className = '';
+  content.innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Inversión total</div>
+        <div class="kpi-value">${fmtCLP(totalMonto)}</div>
+        <div class="kpi-sub">Acumulado período</div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-label">Organizaciones</div>
+        <div class="kpi-value">${orgs.size}</div>
+        <div class="kpi-sub">Beneficiarias únicas</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Sectores</div>
+        <div class="kpi-value">${sectores.size}</div>
+        <div class="kpi-sub">Con inversión registrada</div>
+      </div>
+      <div class="kpi orange">
+        <div class="kpi-label">Beneficiarios</div>
+        <div class="kpi-value">${totalBenef.toLocaleString('es-CL')}</div>
+        <div class="kpi-sub">Suma directos reportados</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Inversión por año</div>
+        <div class="card-sub">Evolución temporal del monto invertido</div>
+        <div class="chart-box"><canvas id="chart-years"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Top 8 sectores</div>
+        <div class="card-sub">Concentración geográfica de la inversión</div>
+        <div class="chart-box"><canvas id="chart-sectores"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 14px;">
+      <div class="card-title">Distribución por tipo de organización</div>
+      <div class="card-sub">Quién recibe la inversión</div>
+      <div class="chart-box"><canvas id="chart-tipos"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Top 10 organizaciones receptoras</div>
+      <div class="card-sub">Mayores receptoras de inversión en el período</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Organización</th>
+            <th>Tipo</th>
+            <th>Sector</th>
+            <th style="text-align:right;">Monto</th>
+            <th style="text-align:right;">Reg.</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${topOrgs.map(([org, d]) => `
+            <tr>
+              <td>${org}</td>
+              <td style="font-size:10px; color:var(--text-mute);">${d.tipo || '—'}</td>
+              <td>${d.sector || '—'}</td>
+              <td class="num">${fmtCLP(d.monto)}</td>
+              <td class="num">${d.count}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // ═══ GRÁFICOS ═══
+  Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, Inter, sans-serif';
+  Chart.defaults.font.size = 11;
+  Chart.defaults.color = '#5F5E5A';
+
+  // Años
+  const años = Object.keys(porAño).sort();
+  new Chart(document.getElementById('chart-years'), {
+    type: 'bar',
+    data: {
+      labels: años,
+      datasets: [{
+        data: años.map(y => porAño[y]),
+        backgroundColor: años.map((_, i) => i === años.length - 1 ? COLORS.green : COLORS.navy),
+        borderRadius: 4,
+        maxBarThickness: 70
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => fmtCLP(c.parsed.y) } }
+      },
+      scales: {
+        y: { ticks: { callback: v => fmtCLP(v) }, grid: { color: COLORS.border } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Sectores (barras horizontales)
+  new Chart(document.getElementById('chart-sectores'), {
+    type: 'bar',
+    data: {
+      labels: sectoresOrdenados.map(x => x[0]),
+      datasets: [{
+        data: sectoresOrdenados.map(x => x[1]),
+        backgroundColor: sectoresOrdenados.map((_, i) => i === 0 ? COLORS.orange : COLORS.navy),
+        borderRadius: 3
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => fmtCLP(c.parsed.x) } }
+      },
+      scales: {
+        x: { ticks: { callback: v => fmtCLP(v) }, grid: { color: COLORS.border } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Tipos (donut)
+  const palette = [COLORS.green, COLORS.orange, COLORS.navy, '#5A8AAD', '#6B7F95', '#8FA3BD', '#B0BCCC', '#A8B5C4', '#7E94AB', '#9B7F6B', '#B5947A'];
+  new Chart(document.getElementById('chart-tipos'), {
+    type: 'doughnut',
+    data: {
+      labels: tiposOrdenados.map(x => x[0]),
+      datasets: [{
+        data: tiposOrdenados.map(x => x[1]),
+        backgroundColor: tiposOrdenados.map((_, i) => palette[i % palette.length]),
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '55%',
+      plugins: {
+        legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } },
+        tooltip: { callbacks: { label: c => `${c.label}: ${fmtCLP(c.parsed)}` } }
+      }
+    }
+  });
+}
+
+loadData();
+</script>
+</body>
+</html>
