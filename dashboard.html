@@ -554,7 +554,7 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
   <div class="sidebar-icon" data-section="inversion" data-tooltip="Inversión 2022-2025" onclick="switchSection('inversion')">$</div>
   <div class="sidebar-icon" data-section="territorio" data-tooltip="Territorio" onclick="switchSection('territorio')">⬡</div>
   <div class="sidebar-icon" data-section="mapa" data-tooltip="Mapa interactivo" onclick="switchSection('mapa')">◉</div>
-  <div class="sidebar-icon" data-section="equidad" data-tooltip="Decisión 2026" onclick="switchSection('equidad')">⚖</div>
+  <div class="sidebar-icon" data-section="equidad" data-tooltip="Mapa social del territorio" onclick="switchSection('equidad')">⚖</div>
   <div class="sidebar-icon" data-section="ficha" data-tooltip="Ficha del sector" onclick="switchSection('ficha')">▤</div>
   <div class="sidebar-icon" data-section="necesidades" data-tooltip="Necesidades operacionales" onclick="switchSection('necesidades')">⚡</div>
   <div class="sidebar-icon" data-section="riesgos" data-tooltip="Riesgos y prioridades" onclick="switchSection('riesgos')">⚠</div>
@@ -913,9 +913,9 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 <!-- DECISIÓN 2026 -->
 <section class="section" id="sec-equidad">
   <div class="section-head">
-    <div class="section-eyebrow">Herramienta de decisión</div>
-    <h1 class="section-title">¿Dónde debería invertir INVERMAR en 2026?</h1>
-    <p class="section-desc">Compara la inversión histórica recibida por cada sector con su nivel de vulnerabilidad social (Censo INE 2024). 4 de 5 sectores con polígono GIS están sub-invertidos respecto a su vulnerabilidad real.</p>
+    <div class="section-eyebrow">Mapa social del territorio · Censo INE 2024</div>
+    <h1 class="section-title">Mapa social del territorio</h1>
+    <p class="section-desc">Cruce visual entre la realidad social de los sectores (Censo INE 2024) y la inversión histórica recibida. Una capa de información para que el equipo de Sostenibilidad contextualice las conversaciones con cada comunidad.</p>
   </div>
 
   <div class="card mb-16">
@@ -934,9 +934,9 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
   <div class="grid g-asym-l">
     <div class="card">
       <div class="card-head">
-        <div class="card-eyebrow">⚖ ANÁLISIS DE EQUIDAD</div>
-        <div class="card-title">Vulnerabilidad vs Inversión recibida</div>
-        <div class="card-sub">Si la barra naranja (vulnerabilidad) supera ampliamente a la verde (inversión), el sector está sub-invertido</div>
+        <div class="card-eyebrow">VULNERABILIDAD VS INVERSIÓN HISTÓRICA</div>
+        <div class="card-title">¿Cómo se han distribuido los apoyos?</div>
+        <div class="card-sub">Lectura visual: dónde la barra naranja (vulnerabilidad) supera a la verde (inversión recibida), hay sectores que pueden requerir más atención. No es una fórmula — es un insumo para la conversación.</div>
       </div>
       <div class="card-body">
         <div id="equity-bars"></div>
@@ -967,16 +967,7 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
     </div>
   </div>
 
-  <div class="card mt-16">
-    <div class="card-head">
-      <div class="card-eyebrow">🎯 RECOMENDACIÓN AUTOMÁTICA</div>
-      <div class="card-title">Asignación 2026 sugerida según IVC</div>
-      <div class="card-sub">Si la cartera 2026 fuera de $50M y se distribuyera proporcionalmente al IVC, así debería repartirse vs. cómo se ha repartido históricamente</div>
-    </div>
-    <div class="card-body">
-      <div class="chart-box tall"><canvas id="chart-recom"></canvas></div>
-    </div>
-  </div>
+
 </section>
 
 <!-- RIESGOS -->
@@ -2376,7 +2367,6 @@ function renderChoroplethLegend(varDef, min, max) {
 // ============== EQUIDAD ==============
 function renderEquidad() {
   renderEquityBars();
-  renderRecomChart();
   initChoropleth();
   if (choroplethMap) setTimeout(() => choroplethMap.invalidateSize(), 100);
 }
@@ -2403,32 +2393,7 @@ function renderEquityBars() {
     }).join('');
 }
 
-function renderRecomChart() {
-  const ctx = $('#chart-recom'); if (!ctx) return;
-  const sorted = [...DATA.sectores_poly].sort((a,b) => b.ivc - a.ivc);
-  const totalIvc = sorted.reduce((s,x)=>s+x.ivc, 0);
-  const totalInvActual = sorted.reduce((s,x)=>s+x.inv_mm, 0);
-  const presup = 50;
-  const labels = sorted.map(s => s.sector);
-  const recom = sorted.map(s => (s.ivc/totalIvc)*presup);
-  const actualPct = sorted.map(s => (s.inv_mm/totalInvActual)*presup);
-  destroyChart('recom');
-  charts.recom = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Histórico (proporcional 2022-2025)', data: actualPct, backgroundColor: COLORS.gray, borderRadius: 4 },
-        { label: 'Recomendado (proporcional al IVC)', data: recom, backgroundColor: COLORS.green, borderRadius: 4 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } }, tooltip: { callbacks: { label: c => `${c.dataset.label}: $${c.parsed.y.toFixed(1)}M` } } },
-      scales: { y: { ticks: { callback: v => '$' + v + 'M' }, grid: { color: '#EAE7DD' } }, x: { grid: { display: false } } }
-    }
-  });
-}
+
 
 function showSectorDetail(sectorName) {
   const s = DATA.sectores_poly.find(x => x.sector === sectorName);
@@ -2460,7 +2425,7 @@ function showSectorDetail(sectorName) {
       <span class="icon">${s.gap_equidad < -30 ? '⚠' : '✓'}</span>
       <div>
         <b>Gap equidad: ${s.gap_equidad >= 0 ? '+' : ''}${s.gap_equidad}%</b><br>
-        ${s.gap_equidad < -30 ? 'Sub-invertido frente a su vulnerabilidad.' : s.gap_equidad < -10 ? 'Inversión algo por debajo de lo correspondido.' : 'Inversión alineada con vulnerabilidad.'}
+        ${s.gap_equidad < -30 ? 'La inversión histórica está por debajo de lo que sugeriría el IVC.' : s.gap_equidad < -10 ? 'La inversión está algo por debajo del IVC del sector.' : 'La inversión histórica está alineada con el IVC del sector.'}
       </div>
     </div>
   `;
