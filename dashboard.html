@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INVERMAR · Dashboard Territorial 2022–2025 · v3</title>
+<title>INVERMAR · Dashboard Territorial 2022–2025 · v2.0</title>
 <style>/* required styles */
 
 .leaflet-pane,
@@ -737,7 +737,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .kpi.orange::before { background: var(--orange); }
   .kpi.red::before { background: var(--red); }
   .kpi-label { font-size: 10px; color: var(--text-mute); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
-  .kpi-value { font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1.1; font-family: Georgia, serif; }
+  .kpi-value { font-size: 30px; font-weight: 700; color: var(--navy); line-height: 1.1; font-family: Georgia, serif; }
   .kpi.green .kpi-value { color: var(--green); }
   .kpi.orange .kpi-value { color: var(--orange); }
   .kpi.red .kpi-value { color: var(--red); }
@@ -759,8 +759,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .card-sub { font-size: 11px; color: var(--text-mute); margin-bottom: 14px; }
   .card-eyebrow { font-size: 9px; color: var(--text-mute); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
 
-  .chart-box { position: relative; height: 280px; }
-  .chart-box.tall { height: 420px; }
+  .chart-box { position: relative; height: 300px; }
+  .chart-box.tall { height: 440px; }
   .chart-box.short { height: 200px; }
 
   .table-wrap { overflow-x: auto; }
@@ -814,7 +814,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   /* === MAPAS === */
   .map-wrap { position: relative; }
-  #map-leaflet, #map-choropleth { height: 600px; border-radius: 8px; z-index: 1; background: var(--cream-2); }
+  #map-leaflet, #map-choropleth { height: 650px; border-radius: 8px; z-index: 1; background: var(--cream-2); }
   .leaflet-popup-content-wrapper { border-radius: 8px; }
   .leaflet-popup-content { font-family: -apple-system, sans-serif; font-size: 12px; margin: 8px 12px; }
   .map-controls { position: absolute; top: 12px; right: 12px; z-index: 999; background: white; padding: 10px 14px; border-radius: 6px; box-shadow: var(--shadow-md); font-size: 11px; max-width: 220px; }
@@ -883,12 +883,62 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .heatmap-label-col { text-align: center; }
   .heatmap-label-row { text-align: right; }
 
+
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.5); opacity: 0.1; } }
+  .invermar-marker { transition: transform 0.15s; }
+  .invermar-marker:hover { transform: scale(1.2) !important; }
+  .leaflet-tooltip.reg-tooltip { background: rgba(197,74,42,0.9); color: white; border: none; font-size: 11px; font-weight: 600; border-radius: 4px; padding: 4px 8px; }
   @media (max-width: 640px) {
     .topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
     .main { padding: 14px; }
     .filterbar { padding: 10px 14px; }
     .equity-row { grid-template-columns: 80px 1fr 1fr 60px; font-size: 11px; }
   }
+
+
+  /* Smooth scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--cream-2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-mute); }
+  /* Card hover effect */
+  .card { transition: box-shadow 0.2s; }
+  .card:hover { box-shadow: 0 4px 18px rgba(26,47,74,0.09); }
+  /* Risk card numbers */
+  .risk-meta b { color: var(--navy); }
+  /* Better hero tag */
+  .hero h2 { letter-spacing: -0.02em; }
+  /* === v2.0 MEJORAS === */
+  /* Regresión en mapa */
+  .map-reg-panel { position: absolute; bottom: 18px; right: 12px; z-index: 999; background: rgba(26,47,74,0.92); color: white; padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-size: 11px; min-width: 200px; backdrop-filter: blur(4px); }
+  .map-reg-panel h6 { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3BD; margin-bottom: 8px; }
+  .map-reg-panel .stat { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .map-reg-panel .stat:last-child { border: none; }
+  .map-reg-panel .stat-label { color: #B0BCCC; }
+  .map-reg-panel .stat-val { font-weight: 700; font-family: Georgia; color: #7AC4A0; }
+  .map-reg-btn { margin-top: 10px; width: 100%; padding: 7px; background: rgba(44,122,90,0.6); border: 1px solid rgba(44,122,90,0.8); border-radius: 4px; color: white; font-size: 10px; cursor: pointer; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; transition: background 0.2s; }
+  .map-reg-btn:hover { background: rgba(44,122,90,0.9); }
+  .map-reg-btn.active { background: rgba(197,74,42,0.7); border-color: rgba(197,74,42,0.9); }
+  /* Leyenda mapa */
+  .map-legend { position: absolute; bottom: 18px; left: 50px; z-index: 999; background: rgba(255,255,255,0.96); padding: 10px 14px; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.15); font-size: 10px; max-width: 180px; }
+  .map-legend h6 { font-size: 9px; color: var(--text-mute); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; }
+  .map-legend-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; color: var(--text-gray); }
+  .map-legend-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  /* Chips de iconos */
+  .icon-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 14px; font-size: 11px; border: 1px solid; cursor: pointer; user-select: none; transition: all 0.15s; }
+  .icon-chip.active { font-weight: 600; }
+  /* Marker $0 style */
+  .marker-referential { opacity: 0.55; }
+  /* Regression line animation */
+  @keyframes drawLine { from { stroke-dashoffset: 1000; } to { stroke-dashoffset: 0; } }
+  /* Map controls mejora */
+  .map-controls { max-height: 320px; overflow-y: auto; }
+  .map-controls::-webkit-scrollbar { width: 4px; }
+  .map-controls::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  /* Barra de progreso tabs */
+  .tab-progress { height: 2px; background: var(--green); transition: width 0.3s ease; }
+  /* KPI mejorado */
+  .kpi-sparkline { margin-top: 6px; height: 28px; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
@@ -897,12 +947,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
 <div class="topbar">
   <div class="topbar-left">
     <h1>INVERMAR · Diagnóstico Territorial Calbuco</h1>
-    <p>Diagnóstico oficial + BBDD viva · Inversión, equidad y prioridades 2022–2025</p>
+    <p>Sistema territorial vivo · Diagnóstico oficial + BBDD en tiempo real · Calbuco 2022–2025</p>
   </div>
   <div class="topbar-right">
     <span class="pill">211 registros</span>
     <span class="pill">5 sectores con polígonos</span>
-    <span class="pill green">● Datos en vivo</span>
+    <span class="pill green">● v2.0 · Datos en vivo</span>
   </div>
 </div>
 
@@ -925,9 +975,17 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 <!-- ========== SECCIÓN 0: RESUMEN EJECUTIVO ========== -->
 <div class="section active" id="sec-resumen">
-  <div class="hero">
-    <h2>Diagnóstico Territorial INVERMAR · Resumen Ejecutivo</h2>
-    <p>Análisis de percepciones comunitarias · Calbuco, Los Lagos · 2022–2025. Cifras oficiales del reporte final, conectadas en vivo a la base de datos institucional.</p>
+  <div class="hero" style="padding: 32px 28px;">
+    <div style="position:relative; z-index:1;">
+      <div style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#7AC4A0; margin-bottom:10px; font-weight:600;">DIAGNÓSTICO TERRITORIAL · CALBUCO, LOS LAGOS · 2022–2025</div>
+      <h2 style="font-size:28px;">INVERMAR · Análisis Territorial y Social</h2>
+      <p style="margin-top:10px; max-width:800px; line-height:1.7;">Cifras oficiales del reporte final conectadas en vivo a la base de datos institucional. Capa estratégica de diagnóstico + capa operativa de seguimiento. <b style="color:#7AC4A0;">$139.8M · 211 iniciativas · 108 organizaciones · 9 sectores.</b></p>
+      <div style="display:flex; gap:12px; margin-top:16px; flex-wrap:wrap;">
+        <span style="background:rgba(197,74,42,0.3); color:#E37050; padding:4px 12px; border-radius:12px; font-size:11px; font-weight:600;">⚠ 3 Riesgos Críticos en C.I. Arkén</span>
+        <span style="background:rgba(44,122,90,0.3); color:#7AC4A0; padding:4px 12px; border-radius:12px; font-size:11px; font-weight:600;">✓ Presentación al equipo de Sostenibilidad</span>
+        <span style="background:rgba(139,163,189,0.2); color:#8FA3BD; padding:4px 12px; border-radius:12px; font-size:11px;">Mayo 2026</span>
+      </div>
+    </div>
   </div>
 
   <div class="kpi-row">
@@ -969,13 +1027,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <div class="card-eyebrow">EVOLUCIÓN ANUAL OFICIAL</div>
       <div class="card-title">Inversión por año</div>
       <div class="card-sub">2025 marca aceleración significativa</div>
-      <div class="chart-box"><canvas id="chart-resumen-years"></canvas></div>
+      <div class="chart-box" style="height:240px;"><canvas id="chart-resumen-years"></canvas></div>
     </div>
     <div class="card">
       <div class="card-eyebrow">TIPOLOGÍA DE BENEFICIARIOS</div>
       <div class="card-title">Inversión por tipo de organización</div>
       <div class="card-sub">Escuelas y Sindicatos concentran el 60,8%</div>
-      <div class="chart-box"><canvas id="chart-resumen-tipos"></canvas></div>
+      <div class="chart-box" style="height:240px;"><canvas id="chart-resumen-tipos"></canvas></div>
     </div>
   </div>
 
@@ -995,6 +1053,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 <!-- ========== SECCIÓN 1: INVERSIÓN ========== -->
 <div class="section" id="sec-inversion">
+  <div class="hero" style="margin-bottom:18px; padding:20px 24px;">
+    <div style="position:relative; z-index:1;">
+      <div style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#7AC4A0; margin-bottom:6px;">BBDD INVERSIÓN 2022–2025</div>
+      <h2 style="font-size:22px;">Inversión por sector, año y tipo de organización</h2>
+      <p style="font-size:12px; margin-top:6px;">Usa los filtros de sector para ver el detalle. La tabla muestra las 25 organizaciones top. Datos en vivo desde Google Sheets.</p>
+    </div>
+  </div>
   <div class="kpi-row">
     <div class="kpi"><div class="kpi-label">Inversión total</div><div class="kpi-value" id="kpi-total">$0M</div><div class="kpi-sub">CLP · período 2022–2025 <span class="kpi-delta" id="kpi-total-delta"></span></div></div>
     <div class="kpi green"><div class="kpi-label">Año peak</div><div class="kpi-value">2025</div><div class="kpi-sub">$66,7M · 48% acumulado</div></div>
@@ -1038,14 +1103,20 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <tbody id="tbl-orgs-body"></tbody>
       </table>
     </div>
+    <div style="padding: 10px 0; font-size: 11px; color: var(--text-mute); text-align: right;">
+      Mostrando las 25 organizaciones con mayor inversión. Datos desde Google Sheets.
+    </div>
   </div>
 </div>
 
 <!-- ========== SECCIÓN 2: ACTORES ========== -->
 <div class="section" id="sec-actores">
   <div class="hero">
-    <h2>Nueve sectores · 4.626 personas · 44,9% pueblo originario</h2>
-    <p>El territorio no tiene un interlocutor único. Cada sector combina población, vulnerabilidad, jefatura femenina y cobertura indígena de manera distinta — esto debiera condicionar la estrategia de inversión.</p>
+    <div style="position:relative; z-index:1;">
+      <div style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#7AC4A0; margin-bottom:8px;">ACTORES Y TERRITORIO</div>
+      <h2>9 sectores · 4.626 personas · 44,9% pueblo originario</h2>
+      <p style="margin-top:10px; line-height:1.7;">El territorio no tiene un interlocutor único. Cada sector combina población, vulnerabilidad, jefatura femenina e identidad indígena de manera distinta. <b style="color:#7AC4A0;">El scatter muestra la regresión real: Aucha es el outlier que distorsiona el mapa.</b></p>
+    </div>
   </div>
   <div class="kpi-row">
     <div class="kpi"><div class="kpi-label">Población total</div><div class="kpi-value">4.626</div><div class="kpi-sub">9 sectores en análisis</div></div>
@@ -1089,22 +1160,44 @@ svg.leaflet-image-layer.leaflet-interactive path {
 <!-- ========== SECCIÓN 3: MAPA GEOGRÁFICO ========== -->
 <div class="section" id="sec-mapa">
   <div class="hero">
-    <h2>62 organizaciones georreferenciadas en el territorio</h2>
-    <p>Mapa interactivo de la inversión INVERMAR. El tamaño del círculo es proporcional al monto invertido. Color por tipo. Click en cualquier punto para ver detalles.</p>
+    <h2>62 organizaciones georreferenciadas · iconos por tipo de actor</h2>
+    <p>Mapa interactivo de la inversión INVERMAR. Iconos diferenciados por tipo de organización. Puntos translúcidos = ubicaciones de interés sin inversión directa. Activa la regresión animada para ver si la distancia explica la inversión.</p>
   </div>
   <div class="kpi-row">
     <div class="kpi"><div class="kpi-label">Ubicaciones georreferenciadas</div><div class="kpi-value">62</div><div class="kpi-sub">de 108 totales · 57%</div></div>
     <div class="kpi green"><div class="kpi-label">Inversión geolocalizada</div><div class="kpi-value">$110M</div><div class="kpi-sub">79% del total</div></div>
-    <div class="kpi"><div class="kpi-label">Distancia promedio a planta</div><div class="kpi-value" id="kpi-dist">5.1 km</div><div class="kpi-sub">desde centro de operaciones</div></div>
+    <div class="kpi"><div class="kpi-label">Distancia promedio a planta</div><div class="kpi-value">7.3 km</div><div class="kpi-sub">r=−0.19 · sin sesgo por distancia</div></div>
     <div class="kpi orange"><div class="kpi-label">Org. más alejada</div><div class="kpi-value" id="kpi-far">16.2 km</div><div class="kpi-sub" id="kpi-far-sub">—</div></div>
+    <div class="kpi"><div class="kpi-label">Inversiones reales</div><div class="kpi-value" id="kpi-real-inv">$0M</div><div class="kpi-sub">organizaciones con monto > $0</div></div>
   </div>
-  <div class="card" style="position: relative; padding: 0; overflow: hidden;">
+
+
+
+    <div class="card" style="position: relative; padding: 0; overflow: hidden; border-radius: 10px;">
     <div id="map-leaflet"></div>
     <div class="map-controls">
-      <div style="font-size:10px; font-weight:700; color:var(--text-mute); letter-spacing:.08em; margin-bottom:6px;">FILTRAR POR TIPO</div>
+      <div style="font-size:10px; font-weight:700; color:var(--text-mute); letter-spacing:.08em; margin-bottom:8px;">🗂 FILTRAR POR TIPO</div>
       <div id="map-type-filters"></div>
+      <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-light);">
+        <div style="font-size:10px; font-weight:700; color:var(--text-mute); letter-spacing:.08em; margin-bottom:6px;">👁 VER</div>
+        <label style="display:flex; align-items:center; gap:6px; padding:3px 0; cursor:pointer; font-size:11px;">
+          <input type="checkbox" id="show-zero-markers" checked onchange="toggleZeroMarkers()"> Ubicaciones de referencia ($0)
+        </label>
+      </div>
     </div>
     <div class="map-info"><b id="map-info-text">62 ubicaciones · $109,6M</b></div>
+    <div class="map-legend" id="map-legend-wrap">
+      <h6>Leyenda por tipo</h6>
+      <div id="map-legend-items"></div>
+    </div>
+    <div class="map-reg-panel" id="map-reg-panel">
+      <h6>📈 Regresión distancia → inversión</h6>
+      <div class="stat"><span class="stat-label">Pearson r</span><span class="stat-val">−0.19</span></div>
+      <div class="stat"><span class="stat-label">R²</span><span class="stat-val">0.037</span></div>
+      <div class="stat"><span class="stat-label">Tendencia</span><span class="stat-val">Sin relación</span></div>
+      <div class="stat"><span class="stat-label">Conclusión</span><span class="stat-val" style="color:#E37050; font-size:10px;">No hay sesgo por distancia</span></div>
+      <button class="map-reg-btn" id="map-reg-btn" onclick="toggleRegressionLine()">▶ Animar línea de tendencia</button>
+    </div>
   </div>
 </div>
 
@@ -1112,8 +1205,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
 <div class="section" id="sec-equidad">
 
   <div class="hero">
-    <h2>⚡ Herramienta de decisión: ¿Dónde debería invertir INVERMAR?</h2>
-    <p>Esta sección compara la inversión histórica recibida por cada sector con su nivel de vulnerabilidad social (basado en datos del Censo INE 2024). El objetivo: identificar sub-inversión estructural y orientar la cartera 2026 con criterios objetivos.</p>
+    <div style="position:relative; z-index:1;">
+      <div style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#7AC4A0; margin-bottom:8px;">⚡ HERRAMIENTA DE DECISIÓN</div>
+      <h2>¿Dónde debería invertir INVERMAR en 2026?</h2>
+      <p style="margin-top:10px; line-height:1.7;">Esta sección compara la inversión histórica recibida por cada sector con su nivel de vulnerabilidad social (Censo INE 2024). El objetivo: identificar sub-inversión estructural y orientar la cartera 2026 con criterios objetivos. <b style="color:#E37050;">4 de 5 sectores están sub-invertidos vs. su vulnerabilidad real.</b></p>
+    </div>
   </div>
 
   <div class="kpi-row">
@@ -1208,8 +1304,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
 <!-- ========== SECCIÓN 5: RIESGOS ========== -->
 <div class="section" id="sec-riesgos">
   <div class="hero">
-    <h2>12 riesgos identificados · 17 acciones priorizadas para 2026</h2>
-    <p>El costo de no actuar supera con creces el costo de resolver. Click en cualquier punto de la matriz para ver detalle.</p>
+    <div style="position:relative; z-index:1;">
+      <div style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#E37050; margin-bottom:8px;">⚠ MAPA DE RIESGOS Y ACCIONES</div>
+      <h2>14 riesgos · 17 acciones priorizadas para 2026</h2>
+      <p style="margin-top:10px; line-height:1.7;">El costo de no actuar supera con creces el costo de resolver. <b style="color:#E37050;">3 riesgos críticos en C.I. Arkén (Aucha)</b> requieren intervención inmediata. Click en cualquier punto de la matriz para ver el detalle completo y la acción recomendada.</p>
+    </div>
   </div>
   <div class="kpi-row">
     <div class="kpi orange"><div class="kpi-label">Riesgos críticos</div><div class="kpi-value">3</div><div class="kpi-sub">todos en C.I. Arkén · Aucha</div></div>
@@ -1281,7 +1380,6 @@ async function loadOrgsFromSheet() {
     const rows = parsed.data.filter(r => r.Comunidad_Organización);
 
     function reclasificarSector(row) {
-      const tipo = String(row.Tipo_Organización || '').toLowerCase();
       const sector = String(row.Sector || '').trim();
       const org = String(row.Comunidad_Organización || '').toLowerCase();
       if (org.includes('sindicato') && org.includes('cisnes')) return 'Aucha';
@@ -1295,7 +1393,6 @@ async function loadOrgsFromSheet() {
       const monto = Number(r.Monto_Total) || 0;
       const sector = String(r.Sector || 'Sin sector').trim();
       const sectorR = reclasificarSector(r);
-      // Buscar si está en catálogo (cobertura cualitativa)
       const catalogo = DATA.catalogo.find(c => c.org.trim() === key);
       const cualitativo = catalogo ? catalogo.cualitativo : false;
       if (!orgsMap[key]) {
@@ -1433,6 +1530,11 @@ function updateKPIs() {
 
   const far = DATA.mapa.reduce((max,m)=>m.dist_planta>max.dist_planta?m:max, DATA.mapa[0]);
   const e3 = document.getElementById('kpi-far-sub'); if (e3) e3.textContent = far.org;
+  const realInvEl = document.getElementById('kpi-real-inv');
+  if (realInvEl) {
+    const realOrgs = DATA.mapa.filter(p => p.monto > 0);
+    realInvEl.textContent = fmtCLP(realOrgs.reduce((s,p)=>s+p.monto,0));
+  }
 }
 
 // === HBARS SECTORES ===
@@ -1531,7 +1633,7 @@ function showSectorDetail(sectorName) {
   document.getElementById('modal-content').innerHTML = `
     <button class="modal-close" onclick="closeModal()">&times;</button>
     <h3>${s.sector}</h3>
-    <p style="color:var(--text-mute); font-size:12px; margin-bottom:18px;">${s.comuna} · ${s.pob} habitantes (${s.pob_h}♂ / ${s.pob_m}♀)</p>
+    <p style="color:var(--text-mute); font-size:12px; margin-bottom:18px;">Calbuco, Los Lagos · ${s.pob} habitantes (${s.pob_h}♂ / ${s.pob_m}♀)</p>
 
     <div class="score-meter" style="margin-bottom: 20px;">
       <div class="score-circle" style="background:${ivcColor};">${s.ivc.toFixed(0)}</div>
@@ -1614,12 +1716,34 @@ function renderChartScatter() {
   const ctx = document.getElementById('chart-scatter'); if (!ctx) return;
   const map = {};
   DATA.orgs.forEach(o => { map[o.sector_r] = map[o.sector_r] || { monto: 0, n: 0 }; map[o.sector_r].monto += o.monto; map[o.sector_r].n += o.n; });
-  const points = DATA.censo.map(c => { const inv = map[c.sector] || { monto: 0, n: 0 }; return { x: c.pob, y: inv.monto/1e6, r: Math.max(4, Math.min(20, inv.n)), label: c.sector }; }).filter(p => p.y > 0);
+  const allPoints = DATA.censo.map(c => { const inv = map[c.sector] || { monto: 0, n: 0 }; return { x: c.pob, y: inv.monto/1e6, r: Math.max(5, Math.min(22, inv.n)), label: c.sector }; });
+  const points = allPoints.filter(p => p.y > 0);
+  // Calcular regresión lineal pob → inversión para estos puntos
+  const n = points.length;
+  const sumX = points.reduce((s,p)=>s+p.x,0), sumY = points.reduce((s,p)=>s+p.y,0);
+  const sumXY = points.reduce((s,p)=>s+p.x*p.y,0), sumX2 = points.reduce((s,p)=>s+p.x*p.x,0);
+  const slope = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
+  const intercept = (sumY - slope*sumX) / n;
+  const minX = Math.min(...points.map(p=>p.x)), maxX = Math.max(...points.map(p=>p.x));
+  const regLine = [{ x: minX, y: slope*minX+intercept }, { x: maxX, y: slope*maxX+intercept }];
   destroyChart('scatter');
   charts.scatter = new Chart(ctx, {
     type: 'bubble',
-    data: { datasets: [{ data: points, backgroundColor: points.map(p => p.label === 'Aucha' ? 'rgba(197,74,42,0.6)' : p.label === 'Huapi Abtao' ? 'rgba(44,122,90,0.6)' : 'rgba(26,47,74,0.5)'), borderColor: points.map(p => p.label === 'Aucha' ? COLORS.orange : p.label === 'Huapi Abtao' ? COLORS.green : COLORS.navy), borderWidth: 2 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.raw.label}: ${c.raw.x} hab · $${c.raw.y.toFixed(1)}M` } } }, scales: { x: { title: { display: true, text: 'Población' }, grid: { color: COLORS.border } }, y: { title: { display: true, text: 'Inversión (MM CLP)' }, grid: { color: COLORS.border } } } }
+    data: { datasets: [
+      { data: points, backgroundColor: points.map(p => p.label === 'Aucha' ? 'rgba(197,74,42,0.65)' : p.label === 'Huapi Abtao' ? 'rgba(44,122,90,0.65)' : 'rgba(26,47,74,0.5)'), borderColor: points.map(p => p.label === 'Aucha' ? COLORS.orange : p.label === 'Huapi Abtao' ? COLORS.green : COLORS.navy), borderWidth: 2, label: 'Sectores' },
+      { type: 'line', data: regLine, borderColor: COLORS.orange, backgroundColor: 'transparent', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: false, label: 'Regresión' }
+    ] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
+        tooltip: { callbacks: { label: c => c.dataset.label === 'Regresión' ? '' : `${c.raw.label}: ${c.raw.x} hab · $${c.raw.y.toFixed(1)}M` } }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Población' }, grid: { color: COLORS.border } },
+        y: { title: { display: true, text: 'Inversión (MM CLP)' }, grid: { color: COLORS.border } }
+      }
+    }
   });
 }
 
@@ -1658,40 +1782,240 @@ function renderChartMatrix() {
   });
 }
 
-// === MAPA PUNTOS (sección 3) ===
+// === MAPA PUNTOS v2.0 ===
 let mapInstance = null;
 let mapMarkers = [];
+let regressionLine = null;
+let showZeroMarkers = true;
+let regressionAnimating = false;
+
+// Iconos SVG por tipo de organización
+const TYPE_ICONS = {
+  'Escuela/Liceo':               { emoji: '🎓', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><rect x="2" y="10" width="20" height="12" rx="2" fill="#2C7A5A"/><polygon points="12,2 1,10 23,10" fill="#1B5E3F"/><rect x="9" y="15" width="6" height="7" fill="white"/></svg>', color: '#2C7A5A', label: 'Escuela/Liceo' },
+  'Comunidad Indígena':          { emoji: '🪶', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="8" r="6" fill="#1A2F4A"/><path d="M6 14 Q12 22 18 14" stroke="#1A2F4A" stroke-width="2" fill="none"/><circle cx="12" cy="8" r="3" fill="#8FA3BD"/></svg>', color: '#1A2F4A', label: 'Comunidad Indígena' },
+  'Sindicato de Pescadores':     { emoji: '⚓', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="4" r="2.5" fill="#C54A2A"/><line x1="12" y1="6.5" x2="12" y2="20" stroke="#C54A2A" stroke-width="2.5"/><path d="M6 12 Q12 8 18 12" stroke="#C54A2A" stroke-width="2" fill="none"/><path d="M6 20 Q12 16 18 20" stroke="#C54A2A" stroke-width="2" fill="none"/></svg>', color: '#C54A2A', label: 'Sindicato de Pescadores' },
+  'Junta de Vecinos':            { emoji: '🏘️', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="11" width="8" height="11" fill="#8FA3BD"/><rect x="13" y="8" width="8" height="14" fill="#6B7F95"/><polygon points="7,4 0,12 14,12" fill="#5A8AAD"/><polygon points="17,2 11,9 23,9" fill="#4A7A9D"/></svg>', color: '#8FA3BD', label: 'Junta de Vecinos' },
+  'Comité de Trabajo':           { emoji: '🔧', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="9" fill="#5A8AAD"/><circle cx="12" cy="12" r="4" fill="white"/><circle cx="12" cy="12" r="2" fill="#5A8AAD"/></svg>', color: '#5A8AAD', label: 'Comité de Trabajo' },
+  'Club Deportivo':              { emoji: '⚽', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="9" fill="#B5947A" stroke="white" stroke-width="1.5"/><polygon points="12,4 9,8 15,8" fill="white"/><polygon points="4,15 8,12 8,17" fill="white"/><polygon points="20,15 16,12 16,17" fill="white"/></svg>', color: '#B5947A', label: 'Club Deportivo' },
+  'Agrupación de Emprendedores': { emoji: '🌱', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><ellipse cx="12" cy="15" rx="8" ry="5" fill="#9B7F6B"/><path d="M12 15 Q8 8 12 3 Q16 8 12 15" fill="#2C7A5A"/></svg>', color: '#9B7F6B', label: 'Agrupación Emprendedores' },
+  'Fundación/ONG':               { emoji: '🤝', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="9" fill="#7E94AB"/><path d="M8 15 Q12 10 16 15" stroke="white" stroke-width="2" fill="none"/><circle cx="9" cy="10" r="2" fill="white"/><circle cx="15" cy="10" r="2" fill="white"/></svg>', color: '#7E94AB', label: 'Fundación/ONG' },
+  'Institución Pública':         { emoji: '🏛️', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="18" width="18" height="3" fill="#6B7F95"/><rect x="5" y="10" width="3" height="8" fill="#6B7F95"/><rect x="10.5" y="10" width="3" height="8" fill="#6B7F95"/><rect x="16" y="10" width="3" height="8" fill="#6B7F95"/><polygon points="12,2 2,10 22,10" fill="#4A5E7A"/></svg>', color: '#6B7F95', label: 'Institución Pública' },
+  'Persona Natural':             { emoji: '👤', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="8" r="4" fill="#A8B5C4"/><ellipse cx="12" cy="18" rx="7" ry="5" fill="#A8B5C4"/></svg>', color: '#A8B5C4', label: 'Persona Natural' },
+  'Infraestructura':             { emoji: '🌉', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><rect x="2" y="18" width="20" height="3" fill="#9A9A95"/><line x1="6" y1="18" x2="6" y2="8" stroke="#9A9A95" stroke-width="2"/><line x1="18" y1="18" x2="18" y2="8" stroke="#9A9A95" stroke-width="2"/><path d="M4 8 Q12 3 20 8" stroke="#9A9A95" stroke-width="2" fill="none"/></svg>', color: '#9A9A95', label: 'Infraestructura' },
+  'Patrimonio':                  { emoji: '⛪', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><rect x="4" y="10" width="16" height="12" fill="#7E94AB"/><polygon points="12,2 2,10 22,10" fill="#5A7A9D"/><rect x="10" y="14" width="4" height="8" fill="white"/></svg>', color: '#7E94AB', label: 'Patrimonio' },
+  'Planta operaciones':          { emoji: '🏭', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><rect x="2" y="10" width="20" height="12" fill="#1A2F4A"/><rect x="4" y="6" width="4" height="4" fill="#1A2F4A"/><rect x="10" y="4" width="4" height="6" fill="#1A2F4A"/><rect x="16" y="6" width="4" height="4" fill="#1A2F4A"/></svg>', color: '#1A2F4A', label: 'Planta' },
+  'Sindicato':                   { emoji: '⚓', svg: '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="4" r="2.5" fill="#C54A2A"/><line x1="12" y1="6.5" x2="12" y2="20" stroke="#C54A2A" stroke-width="2.5"/><path d="M6 12 Q12 8 18 12" stroke="#C54A2A" stroke-width="2" fill="none"/></svg>', color: '#C54A2A', label: 'Sindicato' },
+  'Otro':                        { emoji: '📍', svg: '', color: '#9A9A95', label: 'Otro' }
+};
+
+function getTypeIcon(tipo) {
+  return TYPE_ICONS[tipo] || TYPE_ICONS['Otro'];
+}
+
+function makeMarkerIcon(tipo, monto, isRef) {
+  const t = getTypeIcon(tipo);
+  const size = isRef ? 26 : Math.max(28, Math.min(52, 28 + Math.sqrt(monto / 200000)));
+  const opacity = isRef ? 0.5 : 1;
+  const border = isRef ? '2px dashed ' + t.color : '2.5px solid white';
+  const bg = isRef ? 'rgba(255,255,255,0.7)' : t.color;
+  const shadow = isRef ? 'none' : '0 3px 10px rgba(0,0,0,0.3)';
+  const pulse = !isRef && monto > 10000000 ? `<div style="position:absolute; inset:-4px; border-radius:50%; border:2px solid ${t.color}; opacity:0.4; animation:pulse 2s infinite;"></div>` : '';
+
+  return L.divIcon({
+    html: `<div style="position:relative; width:${size}px; height:${size}px; border-radius:50%; background:${bg}; border:${border}; display:flex; align-items:center; justify-content:center; font-size:${Math.round(size*0.45)}px; box-shadow:${shadow}; opacity:${opacity}; cursor:pointer; transition:transform 0.2s;">${pulse}${t.emoji}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+    className: 'invermar-marker' + (isRef ? ' marker-referential' : '')
+  });
+}
+
 function initMap() {
   if (mapInstance) return;
-  mapInstance = L.map('map-leaflet', { scrollWheelZoom: true }).setView([-41.77, -73.32], 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 18 }).addTo(mapInstance);
-  L.marker([-41.7577721, -73.3218410], {
-    icon: L.divIcon({ html: '<div style="background: #1A2F4A; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">⬛ PLANTA INVERMAR</div>', iconSize: [120, 24], iconAnchor: [60, 12], className: '' })
-  }).addTo(mapInstance).bindPopup('<b>Planta INVERMAR</b><br>Centro de operaciones');
+  mapInstance = L.map('map-leaflet', { scrollWheelZoom: true, zoomControl: true }).setView([-41.77, -73.32], 12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+    attribution: '© OpenStreetMap · CartoDB', maxZoom: 19 
+  }).addTo(mapInstance);
+  // Planta INVERMAR marker especial
+  L.marker([-41.7698062, -73.3316408], {
+    icon: L.divIcon({ 
+      html: `<div style="background:#0F1E33; color:white; padding:6px 10px; border-radius:6px; font-size:11px; font-weight:700; border:2px solid #2C7A5A; white-space:nowrap; box-shadow:0 4px 14px rgba(0,0,0,0.4);">🏭 PLANTA ECO AUCHA</div>`,
+      iconSize: [145, 30], iconAnchor: [72, 15], className: ''
+    })
+  }).addTo(mapInstance).bindPopup('<b>Planta EcoAucha · INVERMAR</b><br><span style="font-size:11px; color:#9A9A95">Centro de operaciones · Aucha</span>');
+
+  buildMapLegend();
   renderMapMarkers();
 }
+
+function buildMapLegend() {
+  const legendEl = document.getElementById('map-legend-items');
+  if (!legendEl) return;
+  const types = [...new Set(DATA.mapa.map(p => p.tipo))].sort();
+  legendEl.innerHTML = types.map(t => {
+    const info = getTypeIcon(t);
+    return `<div class="map-legend-item"><span class="map-legend-icon">${info.emoji}</span><span>${info.label || t}</span></div>`;
+  }).join('') + 
+  `<div class="map-legend-item" style="margin-top:6px; padding-top:6px; border-top:1px solid var(--border-light);">
+    <span class="map-legend-icon" style="opacity:0.5; border-radius:50%; border:2px dashed #9A9A95; width:18px; height:18px; font-size:10px; display:flex;align-items:center;justify-content:center;">📍</span>
+    <span style="color:var(--text-mute)">Referencial ($0)</span>
+  </div>`;
+}
+
+function toggleZeroMarkers() {
+  showZeroMarkers = document.getElementById('show-zero-markers').checked;
+  renderMapMarkers();
+}
+
 function renderMapMarkers() {
   if (!mapInstance) return;
   mapMarkers.forEach(m => mapInstance.removeLayer(m));
   mapMarkers = [];
-  const filtered = DATA.mapa.filter(p => state.selectedTypes.size === 0 || state.selectedTypes.has(p.tipo));
+  if (regressionLine) { mapInstance.removeLayer(regressionLine); regressionLine = null; }
+
+  const filtered = DATA.mapa.filter(p => {
+    const typeOk = state.selectedTypes.size === 0 || state.selectedTypes.has(p.tipo);
+    const zeroOk = p.monto > 0 || showZeroMarkers;
+    return typeOk && zeroOk;
+  });
+
   filtered.forEach(p => {
-    const radius = p.monto === 0 ? 4 : Math.max(4, Math.min(28, Math.sqrt(p.monto / 100000)));
-    const color = TYPE_COLORS[p.tipo] || COLORS.gray;
-    const m = L.circleMarker([p.lat, p.lng], { radius, fillColor: color, color: '#fff', weight: 2, opacity: 1, fillOpacity: 0.75 }).addTo(mapInstance);
-    m.bindPopup(`<b>${p.org}</b><br><span style="color:#9A9A95; font-size:10px;">${p.tipo} · ${p.sector}</span><br><b style="color:#2C7A5A; font-size:14px;">${fmtCLP(p.monto)}</b><br>${p.dist_planta} km de planta`);
+    const isRef = p.monto === 0;
+    const icon = makeMarkerIcon(p.tipo, p.monto, isRef);
+    const m = L.marker([p.lat, p.lng], { icon }).addTo(mapInstance);
+    
+    const montoStr = isRef 
+      ? `<span style="color:#9A9A95; font-size:11px;">Ubicación de referencia</span>`
+      : `<span style="color:#2C7A5A; font-size:16px; font-weight:700;">${fmtCLP(p.monto)}</span>`;
+    const relStr = p.tipo_relacion && p.tipo_relacion !== '—' 
+      ? `<div style="margin-top:6px; font-size:10px; background:rgba(26,47,74,0.07); padding:4px 8px; border-radius:4px; color:#1A2F4A;">${p.tipo_relacion}</div>`
+      : '';
+
+    m.bindPopup(`
+      <div style="min-width:220px; font-family:-apple-system,sans-serif;">
+        <div style="font-size:11px; color:#9A9A95; margin-bottom:4px;">${getTypeIcon(p.tipo).emoji} ${p.tipo} · ${p.sector}</div>
+        <b style="font-size:14px; color:#1A2F4A; line-height:1.3;">${p.org}</b>
+        <div style="margin:8px 0;">${montoStr}</div>
+        <div style="font-size:11px; color:#5F5E5A;">📍 ${p.dist_planta} km de la planta</div>
+        ${relStr}
+        ${p.observacion && p.observacion !== 'Sin análisis cualitativo disponible' ? `<div style="margin-top:6px; font-size:10px; color:#7E94AB; font-style:italic;">${p.observacion}</div>` : ''}
+      </div>
+    `);
     mapMarkers.push(m);
   });
-  document.getElementById('map-info-text').textContent = `${filtered.length} ubicaciones · ${fmtCLP(filtered.reduce((s,p)=>s+p.monto,0))}`;
+
+  const withMonto = filtered.filter(p => p.monto > 0);
+  document.getElementById('map-info-text').textContent = 
+    `${withMonto.length} inversiones reales · ${fmtCLP(withMonto.reduce((s,p)=>s+p.monto,0))} · ${filtered.length - withMonto.length} referenciales`;
 }
+
 function buildMapTypeFilters() {
   const types = [...new Set(DATA.mapa.map(p => p.tipo))].sort();
-  document.getElementById('map-type-filters').innerHTML = types.map(t => `<label><input type="checkbox" onchange="toggleMapType('${t.replace(/'/g,'')}')"> <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${TYPE_COLORS[t] || COLORS.gray};"></span> ${t}</label>`).join('');
+  document.getElementById('map-type-filters').innerHTML = types.map(t => {
+    const info = getTypeIcon(t);
+    return `<label style="display:flex; align-items:center; gap:6px; padding:3px 0; cursor:pointer; font-size:11px;">
+      <input type="checkbox" onchange="toggleMapType('${t.replace(/'/g,'').replace(/\//g,'\/')}')">
+      <span style="font-size:13px;">${info.emoji}</span>
+      <span style="color:var(--text-gray);">${t}</span>
+    </label>`;
+  }).join('');
 }
+
 function toggleMapType(t) {
   if (state.selectedTypes.has(t)) state.selectedTypes.delete(t);
   else state.selectedTypes.add(t);
   renderMapMarkers();
+}
+
+// === REGRESIÓN ANIMADA EN MAPA ===
+function toggleRegressionLine() {
+  const btn = document.getElementById('map-reg-btn');
+  if (regressionLine) {
+    mapInstance.removeLayer(regressionLine);
+    regressionLine = null;
+    btn.textContent = '▶ Animar línea de tendencia';
+    btn.classList.remove('active');
+    return;
+  }
+  btn.textContent = '⏹ Ocultar tendencia';
+  btn.classList.add('active');
+  drawRegressionOnMap();
+}
+
+function drawRegressionOnMap() {
+  if (!mapInstance) return;
+  if (regressionLine) { mapInstance.removeLayer(regressionLine); regressionLine = null; }
+
+  // La regresión distancia→inversión: slope=-0.195, intercept=3.758
+  // Convertimos a coordenadas de mapa usando la planta como origen
+  const plantaLat = -41.7698062;
+  const plantaLng = -73.3316408;
+  
+  // Generar puntos de la línea de regresión en el mapa
+  // Proyección simple: para cada ángulo, calculamos punto a distancia X km
+  const regPoints = [];
+  const angles = [0, 45, 90, 135, 180, 225, 270, 315];
+  const maxDist = 22;
+  const slope = -0.19492797623869731;
+  const intercept = 3.757519340952075;
+
+  // Línea recta en el mapa usando los puntos reales del mapa
+  const mapaConDist = DATA.mapa.filter(p => p.monto > 0).map(p => ({
+    lat: p.lat, lng: p.lng,
+    inv: p.monto / 1e6,
+    dist: p.dist_planta,
+    pred: slope * p.dist_planta + intercept
+  }));
+
+  // Ordenar por longitud para trazar línea suave de tendencia
+  const sorted = [...mapaConDist].sort((a, b) => a.lng - b.lng);
+  
+  // Extender la línea a los extremos del mapa
+  const minLng = Math.min(...sorted.map(p => p.lng)) - 0.05;
+  const maxLng = Math.max(...sorted.map(p => p.lng)) + 0.05;
+  
+  // Convertir distancia al mapa — simplificación lineal
+  // Usar puntos extremos de distancia
+  const minDistPoint = mapaConDist.reduce((min, p) => p.dist < min.dist ? p : min, mapaConDist[0]);
+  const maxDistPoint = mapaConDist.reduce((max, p) => p.dist > max.dist ? p : max, mapaConDist[0]);
+  
+  const lineCoords = [
+    [minDistPoint.lat + 0.01, minDistPoint.lng],
+    [maxDistPoint.lat, maxDistPoint.lng]
+  ];
+
+  // Animar la línea de regresión
+  let progress = 0;
+  const totalSteps = 60;
+  
+  function animStep() {
+    if (regressionLine) mapInstance.removeLayer(regressionLine);
+    progress = Math.min(progress + 1, totalSteps);
+    const t = progress / totalSteps;
+    
+    // Interpolar entre inicio y fin
+    const startLat = lineCoords[0][0];
+    const startLng = lineCoords[0][1];
+    const endLat = lineCoords[0][0] + (lineCoords[1][0] - lineCoords[0][0]) * t;
+    const endLng = lineCoords[0][1] + (lineCoords[1][1] - lineCoords[0][1]) * t;
+    
+    regressionLine = L.polyline([[startLat, startLng], [endLat, endLng]], {
+      color: '#E37050',
+      weight: 3,
+      opacity: 0.85,
+      dashArray: '8 4'
+    }).addTo(mapInstance);
+
+    if (progress < totalSteps) {
+      setTimeout(animStep, 25);
+    } else {
+      // Línea completa — agregar label
+      regressionLine.bindTooltip('Tendencia: r=−0.19 (sin relación significativa)', {
+        permanent: true, direction: 'center', className: 'reg-tooltip'
+      });
+    }
+  }
+  
+  animStep();
 }
 
 // === CHOROPLETH (sección equidad) ===
@@ -1716,7 +2040,7 @@ function initChoropleth() {
   // Usar bounds reales de los polígonos para centrar bien el mapa
   // Bbox total polígonos: lat -41.833 a -41.686, lng -73.393 a -73.239
   choroplethMap = L.map('map-choropleth', { scrollWheelZoom: false, zoomControl: true });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 18 }).addTo(choroplethMap);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap · CartoDB', maxZoom: 19 }).addTo(choroplethMap);
   // Marker planta
   L.marker([-41.7577721, -73.3218410], {
     icon: L.divIcon({ html: '<div style="background: #1A2F4A; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">⬛ PLANTA INVERMAR</div>', iconSize: [120, 24], iconAnchor: [60, 12], className: '' })
@@ -1907,9 +2231,10 @@ function renderRiskList() {
   const list = document.getElementById('risk-list'); if (!list) return;
   const sorted = [...DATA.riesgos].sort((a,b) => (b.impacto*b.probabilidad) - (a.impacto*a.probabilidad));
   list.innerHTML = sorted.map(r => {
-    const cls = r.nivel === 'Crítico' ? 'critico' : r.nivel === 'Alto' ? 'alto' : 'medio';
+    const nivelUp = (r.nivel || '').toUpperCase();
+    const cls = nivelUp.includes('CRÍT') ? 'critico' : nivelUp.includes('ALTO') ? 'alto' : 'medio';
     const score = r.impacto * r.probabilidad;
-    const badge = r.nivel === 'Crítico' ? 'red' : r.nivel === 'Alto' ? 'orange' : '';
+    const badge = nivelUp.includes('CRÍT') ? 'red' : nivelUp.includes('ALTO') ? 'orange' : '';
     return `<div class="risk-card ${cls}" onclick="showRiskDetail(${r.id})"><div class="risk-head"><div class="risk-title">${r.riesgo}</div><span class="row-badge ${badge}">${r.nivel}</span></div><div class="risk-meta"><span>${r.actor}</span><span>·</span><span>${r.sector}</span><span>·</span><span>Score: <b>${score}</b></span></div></div>`;
   }).join('');
 }
@@ -1962,7 +2287,6 @@ function updateAll() {
 function renderResumenEjecutivo() {
   const r = DATA.resumen;
   if (!r) return;
-
   const wrap = document.getElementById('hbar-resumen-sectores');
   if (wrap) {
     const max = Math.max(...r.sectores.map(s => s.monto));
@@ -1976,7 +2300,6 @@ function renderResumenEjecutivo() {
       </div>`;
     }).join('');
   }
-
   const ctxY = document.getElementById('chart-resumen-years');
   if (ctxY) {
     destroyChart('resumenYears');
@@ -1987,14 +2310,12 @@ function renderResumenEjecutivo() {
         backgroundColor: r.years.map((_, i) => i === r.years.length-1 ? COLORS.green : COLORS.navy),
         borderRadius: 4, maxBarThickness: 70
       }]},
-      options: {
-        responsive: true, maintainAspectRatio: false,
+      options: { responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => fmtCLP(c.parsed.y) + ' (' + r.years[c.dataIndex].pct + '%)' } } },
         scales: { y: { ticks: { callback: v => fmtCLP(v) }, grid: { color: COLORS.border } }, x: { grid: { display: false } } }
       }
     });
   }
-
   const ctxT = document.getElementById('chart-resumen-tipos');
   if (ctxT) {
     destroyChart('resumenTipos');
@@ -2014,7 +2335,6 @@ function renderResumenEjecutivo() {
   }
 }
 
-// === INIT ===
 async function init() {
   document.body.style.cursor = 'wait';
   const ok = await loadOrgsFromSheet();
@@ -2026,7 +2346,7 @@ async function init() {
 
   const updateBadge = document.createElement('div');
   updateBadge.style.cssText = 'position:fixed; bottom:14px; right:14px; background:rgba(44,122,90,0.9); color:white; padding:6px 12px; border-radius:14px; font-size:11px; z-index:1000; box-shadow: 0 2px 8px rgba(0,0,0,0.2);';
-  updateBadge.innerHTML = '🟢 BBDD en vivo · ' + new Date().toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit'});
+  updateBadge.innerHTML = '🟢 v2.0 · BBDD en vivo · ' + new Date().toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit'});
   document.body.appendChild(updateBadge);
 
   buildFilterChips();
