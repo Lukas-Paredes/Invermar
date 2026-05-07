@@ -351,8 +351,9 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 .legend-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 700; }
 
 /* Marker styling */
-.invermar-marker { transition: transform var(--t-fast); }
-.invermar-marker:hover { transform: scale(1.15); z-index: 1000 !important; }
+.invermar-marker { transition: transform var(--t-fast), opacity var(--t-base); }
+.invermar-marker:hover { transform: scale(1.2); z-index: 1000 !important; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
+.invermar-marker > div { transition: transform var(--t-fast); }
 .sector-tooltip { background: rgba(255,255,255,0.92) !important; border: 1px solid var(--warm-400) !important; box-shadow: var(--shadow-sm) !important; padding: 3px 8px !important; font-family: var(--font-sans); font-size: 11px; font-weight: 700; color: var(--navy-800); border-radius: var(--r-xs) !important; }
 .sector-tooltip::before { display: none !important; }
 
@@ -544,21 +545,46 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 .need-sector-pill.high { background: #FBE9E9; color: var(--red-700); }
 
 .filter-desc { font-size: 11px; color: var(--gray-500); font-style: italic; margin-left: auto; padding: 4px 12px; }
+
+/* ===== TOUR DE HALLAZGOS (resumen) ===== */
+.tour-card { background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 100%); color: white; border-radius: var(--r-md); padding: 24px 28px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+.tour-card::before { content: ''; position: absolute; top: -60px; right: -60px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(122,196,160,0.18), transparent); border-radius: 50%; pointer-events: none; }
+.tour-card-head { margin-bottom: 18px; position: relative; z-index: 1; }
+.tour-card-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--green-300); margin-bottom: 4px; }
+.tour-card-title { font-family: var(--font-serif); font-size: 20px; font-weight: 700; line-height: 1.2; }
+.tour-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; position: relative; z-index: 1; }
+.tour-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px; background: rgba(255,255,255,0.05); border-radius: var(--r-sm); border: 1px solid rgba(255,255,255,0.08); transition: all var(--t-fast); }
+.tour-item:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+.tour-num { font-family: var(--font-serif); font-size: 26px; font-weight: 700; color: var(--green-300); line-height: 1; flex-shrink: 0; }
+.tour-content { flex: 1; }
+.tour-title { font-size: 13px; font-weight: 700; color: white; margin-bottom: 4px; }
+.tour-body { font-size: 11px; color: var(--navy-100); line-height: 1.5; }
+
+/* ===== MAP RANKING ===== */
+.map-rank-row { display: grid; grid-template-columns: 1fr 80px 30px; gap: 8px; align-items: center; padding: 8px 6px; cursor: pointer; transition: background var(--t-fast); border-radius: var(--r-xs); font-size: 12px; }
+.map-rank-row:hover { background: var(--warm-100); }
+.map-rank-row.active { background: var(--green-50); }
+.map-rank-row.active .map-rank-name { color: var(--green-900); font-weight: 700; }
+.map-rank-row.active .map-rank-fill { background: var(--green-700); }
+.map-rank-name { color: var(--navy-800); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.map-rank-track { background: var(--warm-300); height: 8px; border-radius: 2px; overflow: hidden; }
+.map-rank-fill { height: 100%; background: var(--navy-700); border-radius: 2px; transition: width 0.4s; }
+.map-rank-val { font-weight: 700; color: var(--navy-800); text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-serif); font-size: 13px; }
 </style>
 </head>
 <body>
 <div id="app">
 <aside class="sidebar">
   <div class="sidebar-logo" title="INVERMAR">⬢</div>
-  <div class="sidebar-icon active" data-section="resumen" data-tooltip="Resumen ejecutivo" onclick="switchSection('resumen')">⌂</div>
-  <div class="sidebar-icon" data-section="inversion" data-tooltip="Inversión 2022-2025" onclick="switchSection('inversion')">$</div>
-  <div class="sidebar-icon" data-section="territorio" data-tooltip="Territorio" onclick="switchSection('territorio')">⬡</div>
-  <div class="sidebar-icon" data-section="mapa" data-tooltip="Mapa interactivo" onclick="switchSection('mapa')">◉</div>
-  <div class="sidebar-icon" data-section="equidad" data-tooltip="Mapa social del territorio" onclick="switchSection('equidad')">⚖</div>
-  <div class="sidebar-icon" data-section="ficha" data-tooltip="Ficha del sector" onclick="switchSection('ficha')">▤</div>
-  <div class="sidebar-icon" data-section="necesidades" data-tooltip="Necesidades operacionales" onclick="switchSection('necesidades')">⚡</div>
-  <div class="sidebar-icon" data-section="riesgos" data-tooltip="Riesgos y prioridades" onclick="switchSection('riesgos')">⚠</div>
-  <div class="sidebar-icon" data-section="actores" data-tooltip="Actores clave" onclick="switchSection('actores')">★</div>
+  <div class="sidebar-icon active" data-section="resumen" data-tooltip="Resumen ejecutivo (1)" onclick="switchSection('resumen')">⌂</div>
+  <div class="sidebar-icon" data-section="inversion" data-tooltip="Inversión 2022-2025 (2)" onclick="switchSection('inversion')">$</div>
+  <div class="sidebar-icon" data-section="territorio" data-tooltip="Territorio (3)" onclick="switchSection('territorio')">⬡</div>
+  <div class="sidebar-icon" data-section="mapa" data-tooltip="Mapa interactivo (4)" onclick="switchSection('mapa')">◉</div>
+  <div class="sidebar-icon" data-section="equidad" data-tooltip="Mapa social (5)" onclick="switchSection('equidad')">⚖</div>
+  <div class="sidebar-icon" data-section="ficha" data-tooltip="Ficha del sector (7)" onclick="switchSection('ficha')">▤</div>
+  <div class="sidebar-icon" data-section="necesidades" data-tooltip="Necesidades (8)" onclick="switchSection('necesidades')">⚡</div>
+  <div class="sidebar-icon" data-section="riesgos" data-tooltip="Riesgos y prioridades (6)" onclick="switchSection('riesgos')">⚠</div>
+  <div class="sidebar-icon" data-section="actores" data-tooltip="Actores clave (9)" onclick="switchSection('actores')">★</div>
 </aside>
 <div class="main-wrap">
 <!-- ============== TOPBAR ============== -->
@@ -580,7 +606,10 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
       <div class="topbar-stat-label">Organizaciones</div>
       <div class="topbar-stat-value" id="topbar-orgs">108</div>
     </div>
-    <span class="live-pill" id="topbar-status">● Cargando…</span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+      <span class="live-pill" id="topbar-status">● Cargando…</span>
+      <span style="font-size:9px;color:var(--gray-500);font-weight:600;letter-spacing:.04em;">SYNC: <span id="sync-time">—</span></span>
+    </div>
   </div>
 </header>
 
@@ -609,6 +638,51 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
     <div class="section-eyebrow">Vista Ejecutiva</div>
     <h1 class="section-title">Diagnóstico territorial INVERMAR · Calbuco</h1>
     <p class="section-desc">Sistema de información que combina la BBDD operativa de inversiones con el diagnóstico social del territorio. Los filtros aplicados en la barra superior recalculan en vivo todas las métricas.</p>
+  </div>
+
+  <!-- Tour de hallazgos para reunión -->
+  <div class="tour-card mb-16">
+    <div class="tour-card-head">
+      <div class="tour-card-eyebrow">5 HALLAZGOS PARA ABRIR LA CONVERSACIÓN</div>
+      <div class="tour-card-title">Lo que el dashboard te dice de un vistazo</div>
+    </div>
+    <div class="tour-grid">
+      <div class="tour-item">
+        <div class="tour-num">01</div>
+        <div class="tour-content">
+          <div class="tour-title">Inversión muy concentrada</div>
+          <div class="tour-body">5 organizaciones reciben más del 60% del total. Una sola (Sindicato Los Cisnes) supera los $33M sin trazabilidad cualitativa.</div>
+        </div>
+      </div>
+      <div class="tour-item">
+        <div class="tour-num">02</div>
+        <div class="tour-content">
+          <div class="tour-title">Brecha de equidad por sector</div>
+          <div class="tour-body">Aucha recibe 51× más por habitante que Huapi Abtao, a pesar de que Huapi tiene 70,8/100 en IVC y 63% pueblo originario.</div>
+        </div>
+      </div>
+      <div class="tour-item">
+        <div class="tour-num">03</div>
+        <div class="tour-content">
+          <div class="tour-title">El programa madura en 2025</div>
+          <div class="tour-body">"Gestión / Articulación" se vuelve la categoría #1 — el sistema deja de ser sólo asistencial y empieza a ser relacional.</div>
+        </div>
+      </div>
+      <div class="tour-item">
+        <div class="tour-num">04</div>
+        <div class="tour-content">
+          <div class="tour-title">Brecha de género visible</div>
+          <div class="tour-body">Sólo el 0,5% de la inversión va a organizaciones lideradas por mujeres ($742K de $139,8M), aunque hay 6 lideresas clave identificadas.</div>
+        </div>
+      </div>
+      <div class="tour-item">
+        <div class="tour-num">05</div>
+        <div class="tour-content">
+          <div class="tour-title">Realidad social no aprovechada</div>
+          <div class="tour-body">Hay 50 variables del Censo INE 2024 disponibles (leña, agua, internet, transporte) que pueden orientar donaciones operacionales.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Pipeline -->
@@ -824,9 +898,33 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 <!-- TERRITORIO -->
 <section class="section" id="sec-territorio">
   <div class="section-head">
-    <div class="section-eyebrow">Análisis territorial</div>
+    <div class="section-eyebrow">Análisis territorial · Censo INE 2024</div>
     <h1 class="section-title">Territorio · 9 sectores · 4.626 personas</h1>
     <p class="section-desc">Demografía, vulnerabilidad social y tipologías de relación. Cruce con el Censo INE 2024 y los grupos focales realizados durante el diagnóstico.</p>
+  </div>
+
+  <!-- Stats del territorio -->
+  <div class="grid g-4 mb-16">
+    <div class="stat green">
+      <div class="stat-label">Población total</div>
+      <div class="stat-value">4.626</div>
+      <div class="stat-sub">9 sectores · Calbuco</div>
+    </div>
+    <div class="stat navy">
+      <div class="stat-label">Pueblo originario</div>
+      <div class="stat-value">44,9%</div>
+      <div class="stat-sub">2.075 personas (Convenio 169 OIT)</div>
+    </div>
+    <div class="stat orange">
+      <div class="stat-label">Jefatura femenina</div>
+      <div class="stat-value">44,5%</div>
+      <div class="stat-sub">prom. de los 9 sectores</div>
+    </div>
+    <div class="stat navy">
+      <div class="stat-label">Sin internet</div>
+      <div class="stat-value">19,8%</div>
+      <div class="stat-sub">Huapi 36,5% · Avellanal 3,4%</div>
+    </div>
   </div>
 
   <div class="grid g-2">
@@ -863,7 +961,7 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
         <div class="chart-box"><canvas id="chart-jjvv"></canvas></div>
       </div>
     </div>
-    <div id="actor-quote"></div>
+    <div></div>
   </div>
 
   <div class="card mt-16">
@@ -887,25 +985,70 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 <!-- MAPA -->
 <section class="section" id="sec-mapa">
   <div class="section-head">
-    <div class="section-eyebrow">Mapa interactivo</div>
+    <div class="section-eyebrow">Mapa interactivo · 62 ubicaciones</div>
     <h1 class="section-title">Geolocalización de la inversión</h1>
-    <p class="section-desc">62 ubicaciones georreferenciadas. Iconos por tipo de actor. Tamaño = monto invertido. Translúcidos = ubicaciones de referencia sin inversión directa.</p>
+    <p class="section-desc">Cada círculo es una organización beneficiaria. La letra indica el tipo (E=Escuela, CI=Comunidad Indígena, S=Sindicato, JV=Junta de Vecinos…). El tamaño es proporcional al monto invertido. Filtrá un sector arriba y los demás se atenúan.</p>
   </div>
 
-  <div class="card" style="position:relative; padding:0; overflow:hidden;">
-    <div id="map-leaflet"></div>
-    <div class="map-controls">
-      <h6>Vista del mapa</h6>
-      <label class="map-radio"><input type="radio" name="map-mode" value="all" checked onchange="setMapMode('all')"> Todos los puntos</label>
-      <label class="map-radio"><input type="radio" name="map-mode" value="real" onchange="setMapMode('real')"> Solo con inversión</label>
-      <label class="map-radio"><input type="radio" name="map-mode" value="ref" onchange="setMapMode('ref')"> Solo referenciales</label>
-      <h6>Filtrar por tipo</h6>
-      <div id="map-type-filters"></div>
+  <!-- KPIs del mapa -->
+  <div class="grid g-4 mb-16">
+    <div class="stat green">
+      <div class="stat-label">Puntos georref.</div>
+      <div class="stat-value" id="mapa-stat-puntos">62</div>
+      <div class="stat-sub" id="mapa-stat-puntos-sub">organizaciones ubicadas</div>
     </div>
-    <div class="map-info"><span id="map-info-text">Cargando…</span></div>
-    <div class="map-legend">
-      <h6>Leyenda</h6>
-      <div id="map-legend-items"></div>
+    <div class="stat navy">
+      <div class="stat-label">Con inversión</div>
+      <div class="stat-value" id="mapa-stat-inv">0</div>
+      <div class="stat-sub" id="mapa-stat-inv-sub">recibieron apoyo monetario o en especie</div>
+    </div>
+    <div class="stat orange">
+      <div class="stat-label">Distancia promedio a planta</div>
+      <div class="stat-value" id="mapa-stat-dist">0 km</div>
+      <div class="stat-sub">desde planta EcoAucha</div>
+    </div>
+    <div class="stat navy">
+      <div class="stat-label">Tipos de actor</div>
+      <div class="stat-value" id="mapa-stat-tipos">0</div>
+      <div class="stat-sub">organizaciones distintas en el mapa</div>
+    </div>
+  </div>
+
+  <div class="grid g-asym-r">
+    <!-- Panel lateral con ranking -->
+    <div class="flex-col gap-12">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-eyebrow">RANKING</div>
+          <div class="card-title">Sectores por presencia en el mapa</div>
+          <div class="card-sub">N° de puntos georreferenciados · click para resaltar</div>
+        </div>
+        <div class="card-body">
+          <div id="mapa-ranking"></div>
+        </div>
+      </div>
+      <div class="info-note info">
+        <span class="icon">💡</span>
+        <div><b>Cómo navegar:</b> Click en un punto para ver el detalle. Doble click para hacer zoom. Usa los radios "Solo con inversión" para ocultar referencias y limpiar la vista.</div>
+      </div>
+    </div>
+
+    <!-- Mapa -->
+    <div class="card" style="position:relative; padding:0; overflow:hidden; min-height:600px;">
+      <div id="map-leaflet"></div>
+      <div class="map-controls">
+        <h6>Vista del mapa</h6>
+        <label class="map-radio"><input type="radio" name="map-mode" value="all" checked onchange="setMapMode('all')"> Todos los puntos</label>
+        <label class="map-radio"><input type="radio" name="map-mode" value="real" onchange="setMapMode('real')"> Solo con inversión</label>
+        <label class="map-radio"><input type="radio" name="map-mode" value="ref" onchange="setMapMode('ref')"> Solo referenciales</label>
+        <h6>Filtrar por tipo</h6>
+        <div id="map-type-filters"></div>
+      </div>
+      <div class="map-info"><span id="map-info-text">Cargando…</span></div>
+      <div class="map-legend">
+        <h6>Leyenda</h6>
+        <div id="map-legend-items"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1049,14 +1192,44 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
   <div class="section-head">
     <div class="section-eyebrow">Diagnóstico cualitativo · 7 fuentes directas</div>
     <h1 class="section-title">Lideresas y actores clave del territorio</h1>
-    <p class="section-desc">Personas y organizaciones identificadas en grupos focales y entrevistas como interlocutores estratégicos para INVERMAR.</p>
+    <p class="section-desc">Personas y organizaciones identificadas en grupos focales y entrevistas como interlocutores estratégicos para INVERMAR. Estas seis lideresas concentran capacidad de convocatoria, conocimiento territorial y poder de gestión.</p>
+  </div>
+
+  <!-- Stats de actores -->
+  <div class="grid g-4 mb-16">
+    <div class="stat green">
+      <div class="stat-label">Lideresas identificadas</div>
+      <div class="stat-value">6</div>
+      <div class="stat-sub">100% mujeres</div>
+    </div>
+    <div class="stat orange">
+      <div class="stat-label">Inversión a orgs femeninas</div>
+      <div class="stat-value">0,5%</div>
+      <div class="stat-sub">$742K de $139,8M</div>
+    </div>
+    <div class="stat navy">
+      <div class="stat-label">Sectores cubiertos</div>
+      <div class="stat-value">5</div>
+      <div class="stat-sub">de los 9 totales</div>
+    </div>
+    <div class="stat navy">
+      <div class="stat-label">Tipos de organización</div>
+      <div class="stat-value">5</div>
+      <div class="stat-sub">CI · Posta · Escuela · JJVV</div>
+    </div>
   </div>
 
   <div class="info-note warn mb-16">
     <span class="icon">⚠</span>
-    <div><b>Brecha de género visible:</b> aunque 6 de las figuras clave son mujeres, las organizaciones femeninas reciben solo el 0,5% del total invertido ($742K de $139,8M).</div>
+    <div><b>Brecha de género visible:</b> aunque 6 de las figuras clave son mujeres, las organizaciones femeninas reciben solo el 0,5% del total invertido ($742K de $139,8M). Una posible línea de trabajo es fondo concursable específico para liderazgos femeninos.</div>
   </div>
 
+  <div class="quote">
+    "La mayoría de las inversiones son cosas <b>para</b> la comunidad, pero no cosas <b>con</b> la comunidad."
+    <small>RAQUEL · APR AUCHA NORTE · GRUPO FOCAL</small>
+  </div>
+
+  <h3 style="margin: 24px 0 12px; font-family: var(--font-serif); font-size: 18px; color: var(--navy-800);">Las 6 lideresas</h3>
   <div class="grid g-2" id="actores-list"></div>
 </section>
 
@@ -1077,14 +1250,48 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 <!-- NECESIDADES OPERACIONALES -->
 <section class="section" id="sec-necesidades">
   <div class="section-head">
-    <div class="section-eyebrow">Decisión operacional · Donaciones y apoyos</div>
-    <h1 class="section-title">Necesidades detectadas en el territorio</h1>
-    <p class="section-desc">Cruces automáticos entre los datos del Censo INE y la cartera operacional. Sirven para identificar qué tipo de apoyo material hace sentido para cada sector — ya sea como donación en especie o como inversión social.</p>
+    <div class="section-eyebrow">Necesidades operacionales · Insumo para donaciones</div>
+    <h1 class="section-title">Cruce INE × Líneas de apoyo posibles</h1>
+    <p class="section-desc">Cada tarjeta combina un indicador del Censo INE con una línea de apoyo concreta que INVERMAR puede ofrecer (donación en especie, articulación, inversión). Son sugerencias para priorizar conversaciones — no recomendaciones automatizadas.</p>
   </div>
 
-  <div class="info-note info mb-16">
-    <span class="icon">ℹ</span>
-    <div>Cada tarjeta cruza un indicador del Censo INE 2024 con una posible línea de apoyo operacional. Los sectores aparecen ordenados por urgencia. <b>No reemplaza el diálogo con la comunidad</b> — es una herramienta para priorizar conversaciones.</div>
+  <!-- KPIs de necesidades -->
+  <div class="grid g-4 mb-16">
+    <div class="stat red">
+      <div class="stat-label">Necesidades urgentes</div>
+      <div class="stat-value" id="neces-stat-urg">0</div>
+      <div class="stat-sub">categorías con sectores en rojo</div>
+    </div>
+    <div class="stat orange">
+      <div class="stat-label">Sectores con &gt;3 necesidades</div>
+      <div class="stat-value" id="neces-stat-3+">0</div>
+      <div class="stat-sub">requieren plan integrado</div>
+    </div>
+    <div class="stat navy">
+      <div class="stat-label">Sector con más necesidades</div>
+      <div class="stat-value" id="neces-stat-top" style="font-size:18px;">—</div>
+      <div class="stat-sub" id="neces-stat-top-n">—</div>
+    </div>
+    <div class="stat green">
+      <div class="stat-label">Líneas de apoyo activas</div>
+      <div class="stat-value" id="neces-stat-lineas">12</div>
+      <div class="stat-sub">categorías evaluadas</div>
+    </div>
+  </div>
+
+  <!-- Selector de orden -->
+  <div class="filter-block mb-16" style="background:white; padding:10px 14px; border-radius:8px; border:1px solid var(--warm-300);">
+    <span class="filter-label">Ordenar por</span>
+    <div class="chip-group">
+      <span class="chip active" data-needs-sort="urgency" onclick="sortNeeds('urgency')">Urgencia</span>
+      <span class="chip" data-needs-sort="affected" onclick="sortNeeds('affected')">Sectores afectados</span>
+      <span class="chip" data-needs-sort="value" onclick="sortNeeds('value')">Valor más alto</span>
+    </div>
+  </div>
+
+  <div class="info-note warn mb-16">
+    <span class="icon">⚠</span>
+    <div><b>Importante:</b> No reemplaza el diálogo con la comunidad. Cualquier acción debe acordarse con la organización beneficiaria. Esto sirve sólo como input para preparar conversaciones.</div>
   </div>
 
   <div class="grid g-3" id="needs-grid"></div>
@@ -1127,6 +1334,7 @@ const SECTION_FILTERS = {
 const state = {
   section: 'resumen',
   fichaSector: null,
+  needsSort: 'urgency',
   selectedSectors: new Set(),
   selectedYears: new Set(),
   selectedTypes: new Set(),
@@ -2007,6 +2215,42 @@ function makeMarkerIcon(tipo, monto, isRef, isOutOfFilter) {
   });
 }
 
+function renderMapKPIs() {
+  const all = DATA.mapa.filter(p => p.tipo !== 'Planta operaciones');
+  const withInv = all.filter(p => p.monto > 0);
+  const tipos = new Set(all.map(p => p.tipo));
+  const distProm = all.length ? all.reduce((s,p) => s + (parseFloat(p.dist_planta) || 0), 0) / all.length : 0;
+  if ($('#mapa-stat-puntos')) $('#mapa-stat-puntos').textContent = all.length;
+  if ($('#mapa-stat-puntos-sub')) $('#mapa-stat-puntos-sub').textContent = all.length + ' organizaciones ubicadas';
+  if ($('#mapa-stat-inv')) $('#mapa-stat-inv').textContent = withInv.length;
+  if ($('#mapa-stat-inv-sub')) $('#mapa-stat-inv-sub').textContent = (all.length ? Math.round(withInv.length/all.length*100) : 0) + '% del total';
+  if ($('#mapa-stat-dist')) $('#mapa-stat-dist').textContent = distProm.toFixed(1) + ' km';
+  if ($('#mapa-stat-tipos')) $('#mapa-stat-tipos').textContent = tipos.size;
+}
+
+function renderMapRanking() {
+  const wrap = $('#mapa-ranking'); if (!wrap) return;
+  const all = DATA.mapa.filter(p => p.tipo !== 'Planta operaciones');
+  const bySector = {};
+  all.forEach(p => {
+    const s = p.sector || 'Sin sector';
+    if (!bySector[s]) bySector[s] = { n: 0, monto: 0 };
+    bySector[s].n += 1;
+    bySector[s].monto += (p.monto || 0);
+  });
+  const arr = Object.entries(bySector).sort((a,b) => b[1].n - a[1].n);
+  const max = arr[0]?.[1].n || 1;
+  wrap.innerHTML = arr.map(([s, data]) => {
+    const w = (data.n / max) * 100;
+    const isActive = state.selectedSectors.has(s);
+    return `<div class="map-rank-row ${isActive ? 'active' : ''}" onclick="toggleSector('${s.replace(/'/g,'')}')">
+      <div class="map-rank-name">${escapeHtml(s)}</div>
+      <div class="map-rank-track"><div class="map-rank-fill" style="width:${w}%"></div></div>
+      <div class="map-rank-val">${data.n}</div>
+    </div>`;
+  }).join('');
+}
+
 function initMap() {
   if (mapInstance) return;
   mapInstance = L.map('map-leaflet', { scrollWheelZoom: true }).setView([-41.77, -73.32], 12);
@@ -2590,14 +2834,6 @@ function renderActores() {
     </div>
   `).join('');
 
-  // Quote box
-  const qwrap = $('#actor-quote');
-  if (qwrap) qwrap.innerHTML = `
-    <div class="quote">
-      "La mayoría de las inversiones son cosas <b>para</b> la comunidad, pero no cosas <b>con</b> la comunidad."
-      <small>RAQUEL · APR AUCHA NORTE · GRUPO FOCAL</small>
-    </div>
-  `;
 }
 
 // ============== SECTION SWITCHING ==============
@@ -2637,6 +2873,8 @@ function refreshAll() {
   else if (state.section === 'territorio') renderTerritorio();
   else if (state.section === 'mapa') {
     initMap();
+    renderMapKPIs();
+    renderMapRanking();
     if (mapInstance) setTimeout(() => mapInstance.invalidateSize(), 100);
   }
   else if (state.section === 'equidad') renderEquidad();
@@ -2682,6 +2920,29 @@ async function init() {
 
   // Resize
   window.addEventListener('resize', () => setTimeout(refreshAll, 100));
+
+  // Atajos de teclado
+  const sectionKeys = ['resumen','inversion','territorio','mapa','equidad','riesgos','ficha','necesidades','actores'];
+  document.addEventListener('keydown', (e) => {
+    // No interferir con inputs
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    const num = parseInt(e.key);
+    if (num >= 1 && num <= 9 && sectionKeys[num-1]) {
+      switchSection(sectionKeys[num-1]);
+    }
+    // Esc cierra modal
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // Última sincronización
+  updateSyncTimestamp();
+}
+
+function updateSyncTimestamp() {
+  const el = $('#sync-time'); if (!el) return;
+  const now = new Date();
+  const time = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+  el.textContent = time;
 }
 
 
@@ -2821,11 +3082,24 @@ function renderFichaContent() {
     const metricsHTML = cat.metrics.map(m => {
       const val = s[m.k];
       if (val == null) return `<div class="ficha-metric"><div class="ficha-metric-label">${m.l}</div><div></div><div class="ficha-metric-val text-mute">—</div></div>`;
+      // Calcular promedio del territorio
+      const allVals = (DATA.censo_full || []).map(c => c[m.k]).filter(v => v != null);
+      const avg = allVals.length ? allVals.reduce((a,b)=>a+b,0)/allVals.length : 0;
+      const diff = val - avg;
+      const diffStr = (diff >= 0 ? '+' : '') + diff.toFixed(1);
+      const isWorse = m.invert ? (val < avg) : (val > avg);
+      const diffColor = Math.abs(diff) < 1 ? 'var(--gray-500)' : (isWorse ? 'var(--red-700)' : 'var(--green-700)');
       const w = Math.min(100, (val / m.max) * 100);
       const color = metricColor(val, m);
+      const avgW = Math.min(100, (avg / m.max) * 100);
       return `<div class="ficha-metric">
-        <div class="ficha-metric-label">${m.l}</div>
-        <div class="ficha-metric-bar-wrap"><div class="ficha-metric-bar-track"><div class="ficha-metric-bar-fill" style="width:${w}%;background:${color}"></div></div></div>
+        <div class="ficha-metric-label">${m.l}<div style="font-size:10px;color:var(--gray-500);margin-top:1px;">prom. territorio: ${m.fmt(avg)} <span style="color:${diffColor};font-weight:700;margin-left:4px;">${diffStr}${m.unit||''}</span></div></div>
+        <div class="ficha-metric-bar-wrap">
+          <div class="ficha-metric-bar-track" style="position:relative;">
+            <div class="ficha-metric-bar-fill" style="width:${w}%;background:${color}"></div>
+            <div style="position:absolute;left:${avgW}%;top:-2px;bottom:-2px;width:2px;background:var(--navy-700);"></div>
+          </div>
+        </div>
         <div class="ficha-metric-val">${m.fmt(val)}</div>
       </div>`;
     }).join('');
@@ -2937,8 +3211,8 @@ const NEEDS_RULES = [
 
 function renderNecesidades() {
   const wrap = $('#needs-grid'); if (!wrap || !DATA.censo_full) return;
-  const cards = NEEDS_RULES.map(rule => {
-    // Sectores afectados ordenados por valor
+  // Calcular dataset enriquecido con métricas
+  const enriched = NEEDS_RULES.map(rule => {
     const affected = DATA.censo_full
       .map(c => ({ sector: c.sector, val: c[rule.metric] }))
       .filter(x => x.val != null && x.val >= rule.threshold)
@@ -2946,6 +3220,32 @@ function renderNecesidades() {
     if (!affected.length) return null;
     const top = affected[0];
     const level = top.val >= rule.threshHigh ? 'high' : top.val >= rule.threshMed ? 'med' : 'low';
+    const levelScore = level === 'high' ? 3 : level === 'med' ? 2 : 1;
+    return { rule, affected, top, level, levelScore };
+  }).filter(Boolean);
+
+  // Ordenar
+  const sortMode = state.needsSort || 'urgency';
+  if (sortMode === 'urgency') enriched.sort((a,b) => b.levelScore - a.levelScore || b.top.val - a.top.val);
+  else if (sortMode === 'affected') enriched.sort((a,b) => b.affected.length - a.affected.length);
+  else if (sortMode === 'value') enriched.sort((a,b) => b.top.val - a.top.val);
+
+  // KPIs
+  const urgentCount = enriched.filter(e => e.level === 'high').length;
+  const sectorNeedCount = {};
+  enriched.forEach(e => e.affected.forEach(s => {
+    sectorNeedCount[s.sector] = (sectorNeedCount[s.sector] || 0) + 1;
+  }));
+  const sectors3plus = Object.values(sectorNeedCount).filter(n => n >= 3).length;
+  const topSectorEntry = Object.entries(sectorNeedCount).sort((a,b) => b[1] - a[1])[0];
+
+  if ($('#neces-stat-urg')) $('#neces-stat-urg').textContent = urgentCount;
+  if ($('#neces-stat-3+')) $('#neces-stat-3+').textContent = sectors3plus;
+  if ($('#neces-stat-top') && topSectorEntry) $('#neces-stat-top').textContent = topSectorEntry[0];
+  if ($('#neces-stat-top-n') && topSectorEntry) $('#neces-stat-top-n').textContent = topSectorEntry[1] + ' necesidades detectadas';
+
+  // Render
+  const cards = enriched.map(({rule, affected, top, level}) => {
     const sectorPills = affected.map(s => {
       const lvl = s.val >= rule.threshHigh ? 'high' : '';
       return `<span class="need-sector-pill ${lvl}">${escapeHtml(s.sector)} ${rule.format(s.val)}</span>`;
@@ -2964,8 +3264,14 @@ function renderNecesidades() {
         <div class="need-sectors-list">${sectorPills}</div>
       </div>
     `;
-  }).filter(Boolean).join('');
+  }).join('');
   wrap.innerHTML = cards || '<div class="info-note success">No se detectan necesidades urgentes con los umbrales actuales.</div>';
+}
+
+function sortNeeds(mode) {
+  state.needsSort = mode;
+  $$('.chip[data-needs-sort]').forEach(c => c.classList.toggle('active', c.dataset.needsSort === mode));
+  renderNecesidades();
 }
 
 
