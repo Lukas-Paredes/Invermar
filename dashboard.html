@@ -570,6 +570,19 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 .map-rank-track { background: var(--warm-300); height: 8px; border-radius: 2px; overflow: hidden; }
 .map-rank-fill { height: 100%; background: var(--navy-700); border-radius: 2px; transition: width 0.4s; }
 .map-rank-val { font-weight: 700; color: var(--navy-800); text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-serif); font-size: 13px; }
+
+/* === SCOPE TOGGLE (sectores piloto / todos) === */
+.scope-toggle { display: inline-flex; background: white; border: 1px solid var(--warm-400); border-radius: 14px; padding: 2px; gap: 1px; }
+.scope-btn { padding: 5px 12px; background: transparent; border: none; border-radius: 12px; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--gray-700); transition: all var(--t-fast); white-space: nowrap; font-family: var(--font-sans); }
+.scope-btn:hover { color: var(--navy-800); }
+.scope-btn.active { background: var(--green-700); color: white; }
+
+/* Tooltip diferenciado para sector piloto */
+.sector-tooltip.pilot { background: rgba(15,30,51,0.92) !important; color: white !important; border: 1.5px solid var(--green-500) !important; font-weight: 700 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important; }
+
+/* Leyenda con explicación piloto/contexto */
+.choropleth-legend .legend-pilot-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--warm-200); font-size: 10px; color: var(--gray-700); }
+.legend-pilot-swatch { width: 14px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -1065,7 +1078,7 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
     <div class="card-head">
       <div class="card-eyebrow">CHOROPLETH INTERACTIVO · CENSO INE 2024</div>
       <div class="card-title">Mapa por variable social</div>
-      <div class="card-sub">Click en un sector para ficha completa. Las 40 localidades de Calbuco mapeadas con datos del Censo INE 2024.</div>
+      <div class="card-sub">Sectores piloto destacados · resto de Calbuco como contexto. Click en cualquier sector para ver ficha completa. Cambia con los botones "9 piloto / 40 localidades".</div>
     </div>
     <div class="var-selector" id="var-selector"></div>
     <div style="position:relative;">
@@ -1346,11 +1359,18 @@ const state = {
   mapMode: 'all',       // 'all' | 'real' | 'ref'
   mapTypeFilter: new Set(),
   choroplethVar: 'ivc',
+  choroplethScope: 'pilot', // 'pilot' = solo piloto destacados, 'all' = todos iguales
   sortField: 'monto',
   sortDir: 'desc'
 };
 
 // ============== COLORS ==============
+// Sectores piloto — donde INVERMAR opera operacionalmente
+const PILOT_SECTORS = new Set([
+  'Aucha', 'Aguantao', 'Peñasmo', 'Huapi Abtao', 'Colaco',
+  'Avellanal', 'Chayahué', 'El Dao', 'Pargua'
+]);
+
 const COLORS = {
   navy: '#1A2F4A',
   navyDark: '#0F1E33',
@@ -2494,6 +2514,10 @@ function buildVarSelector() {
     <div class="var-featured-row">
       <div class="var-featured-label">Vars clave:</div>
       <div class="var-featured-btns">${featuredHTML}</div>
+      <div class="scope-toggle">
+        <button class="scope-btn ${state.choroplethScope === 'pilot' ? 'active' : ''}" onclick="setChoroplethScope('pilot')" title="Destacar los 9 sectores piloto">9 piloto</button>
+        <button class="scope-btn ${state.choroplethScope === 'all' ? 'active' : ''}" onclick="setChoroplethScope('all')" title="Ver todas las localidades por igual">40 localidades</button>
+      </div>
       <button class="var-more-btn" id="var-more-btn" onclick="toggleVarDropdown()">
         <span>+45 vars INE</span><span class="caret">▾</span>
       </button>
@@ -2538,6 +2562,12 @@ function changeChoroplethVar(k) {
   if (dd) dd.classList.remove('open');
   const btn = $('#var-more-btn');
   if (btn) btn.classList.remove('open');
+}
+
+function setChoroplethScope(scope) {
+  state.choroplethScope = scope;
+  buildVarSelector();
+  renderChoropleth();
 }
 
 function getChoroplethColor(val, min, max, invert) {
@@ -2590,13 +2620,37 @@ function renderChoropleth() {
   }, {
     style: f => {
       const v = f.properties[varDef.key];
-      if (v === undefined || v === null) return { fillColor: '#ccc', weight: 2.5, opacity: 1, color: 'white', fillOpacity: 0.4 };
-      return { fillColor: getChoroplethColor(v, min, max, varDef.invert), weight: 2.5, opacity: 1, color: 'white', fillOpacity: 0.85 };
+      const isPilot = PILOT_SECTORS.has(f.properties.sector);
+      const showAll = state.choroplethScope === 'all';
+      const dimNonPilot = !showAll && !isPilot;
+      if (v === undefined || v === null) {
+        return {
+          fillColor: '#ccc',
+          weight: dimNonPilot ? 1 : 2.5,
+          opacity: dimNonPilot ? 0.5 : 1,
+          color: 'white',
+          fillOpacity: dimNonPilot ? 0.15 : 0.4
+        };
+      }
+      return {
+        fillColor: getChoroplethColor(v, min, max, varDef.invert),
+        weight: dimNonPilot ? 1 : (isPilot ? 3 : 2.5),
+        opacity: dimNonPilot ? 0.5 : 1,
+        color: dimNonPilot ? '#888' : 'white',
+        fillOpacity: dimNonPilot ? 0.25 : (isPilot ? 0.9 : 0.85),
+        dashArray: dimNonPilot ? '3, 3' : null
+      };
     },
     onEachFeature: (f, layer) => {
       const s = f.properties;
       const val = (s[varDef.key] !== undefined && s[varDef.key] !== null) ? varDef.fmt(s[varDef.key]) + varDef.unit : 'sin dato';
-      layer.bindTooltip(s.sector, { permanent: true, direction: 'center', className: 'sector-tooltip' });
+      // Tooltip permanente solo en piloto si estamos en modo 'pilot', si no a todos
+      const showPermanent = state.choroplethScope === 'all' || PILOT_SECTORS.has(s.sector);
+      if (showPermanent) {
+        layer.bindTooltip(s.sector, { permanent: true, direction: 'center', className: PILOT_SECTORS.has(s.sector) ? 'sector-tooltip pilot' : 'sector-tooltip' });
+      } else {
+        layer.bindTooltip(s.sector, { permanent: false, direction: 'top', className: 'sector-tooltip' });
+      }
       layer.bindPopup(`
         <div style="min-width:220px;font-family:Inter,sans-serif;">
           <b style="font-size:14px;color:#0F1E33;">${escapeHtml(s.sector)}</b>
@@ -2608,7 +2662,11 @@ function renderChoropleth() {
         </div>
       `);
       layer.on({
-        mouseover: e => e.target.setStyle({ weight: 4, color: '#0F1E33', fillOpacity: 0.95 }),
+        mouseover: e => {
+          const isPilot = PILOT_SECTORS.has(s.sector);
+          e.target.setStyle({ weight: 4, color: '#0F1E33', fillOpacity: 0.95, opacity: 1, dashArray: null });
+          e.target.bringToFront();
+        },
         mouseout: e => choroplethLayer.resetStyle(e.target),
         click: () => showSectorDetail(s.sector)
       });
@@ -2628,6 +2686,9 @@ function renderChoroplethLegend(varDef, min, max) {
   const grad = varDef.invert
     ? `linear-gradient(to right, ${stops[3]}, ${stops[2]}, ${stops[1]}, ${stops[0]})`
     : `linear-gradient(to right, ${stops[0]}, ${stops[1]}, ${stops[2]}, ${stops[3]})`;
+  const scopeNote = state.choroplethScope === 'pilot'
+    ? `<div class="legend-pilot-row"><div class="legend-pilot-swatch" style="background:#2C7A5A;"></div><span><b>9 sectores piloto</b> destacados · resto en transparencia</span></div>`
+    : `<div class="legend-pilot-row"><span style="color:var(--gray-500);">Mostrando las 40 localidades de Calbuco</span></div>`;
   wrap.innerHTML = `
     <h5>${varDef.label}</h5>
     <div style="font-size:10px;color:var(--gray-500);margin-bottom:6px;">${varDef.desc}</div>
@@ -2639,6 +2700,7 @@ function renderChoroplethLegend(varDef, min, max) {
     <div style="font-size:9px;color:var(--gray-500);margin-top:8px;padding-top:6px;border-top:1px solid var(--warm-200);">
       ${varDef.invert ? '🟢 Mayor = mejor' : '🟢 Menor = mejor'}
     </div>
+    ${scopeNote}
   `;
 }
 
