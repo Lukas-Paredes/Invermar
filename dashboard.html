@@ -472,6 +472,76 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 .var-group:last-child { margin-bottom: 0; }
 .var-group-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-500); padding-left: 8px; margin-bottom: 6px; }
 .var-group-btns { display: flex; flex-wrap: wrap; gap: 5px; }
+
+/* === SELECTOR COMPACTO === */
+.var-selector { padding: 14px 18px; background: var(--warm-50); border-bottom: 1px solid var(--warm-300); }
+.var-featured-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.var-featured-label { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-500); white-space: nowrap; }
+.var-featured-btns { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; min-width: 200px; }
+.var-more-btn { padding: 6px 12px; background: white; border: 1px solid var(--warm-400); border-radius: 14px; font-size: 11px; font-weight: 600; color: var(--navy-700); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all var(--t-fast); white-space: nowrap; font-family: var(--font-sans); }
+.var-more-btn:hover, .var-more-btn.open { background: var(--navy-700); color: white; border-color: var(--navy-700); }
+.var-more-btn .caret { transition: transform var(--t-fast); display: inline-block; font-size: 10px; }
+.var-more-btn.open .caret { transform: rotate(180deg); }
+.var-btn.featured { background: white; border-color: var(--green-300); color: var(--green-900); font-weight: 600; }
+.var-btn.featured:hover { background: var(--green-50); border-color: var(--green-700); }
+.var-btn.featured.active { background: var(--green-700); border-color: var(--green-700); color: white; }
+.var-dropdown { max-height: 0; overflow: hidden; transition: max-height var(--t-base); }
+.var-dropdown.open { max-height: 380px; padding: 12px 4px 4px; overflow-y: auto; }
+.var-dropdown-search { position: sticky; top: 0; background: var(--warm-50); padding-bottom: 8px; z-index: 5; }
+.var-dropdown-search input { width: 100%; padding: 6px 12px; border: 1px solid var(--warm-400); border-radius: var(--r-sm); font-size: 12px; font-family: var(--font-sans); outline: none; }
+.var-dropdown-search input:focus { border-color: var(--green-700); box-shadow: 0 0 0 3px var(--green-50); }
+.var-group { margin-bottom: 10px; }
+.var-group-label { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-500); padding-left: 8px; margin-bottom: 6px; border-left: 3px solid; }
+.var-group-btns { display: flex; flex-wrap: wrap; gap: 4px; padding-left: 8px; }
+.var-current-info { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--warm-300); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.var-current-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-500); }
+.var-current-name { font-size: 13px; font-weight: 700; color: var(--green-900); font-family: var(--font-serif); }
+.var-current-desc { font-size: 11px; color: var(--gray-500); font-style: italic; }
+
+/* === FICHA SECTOR === */
+.ficha-selector { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; padding: 10px 14px; background: white; border-radius: var(--r-md); border: 1px solid var(--warm-300); align-items: center; }
+.ficha-selector-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-500); margin-right: 8px; }
+.ficha-sector-btn { padding: 6px 14px; background: white; border: 1.5px solid var(--warm-400); border-radius: 16px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--gray-700); transition: all var(--t-fast); font-family: var(--font-sans); }
+.ficha-sector-btn:hover { border-color: var(--green-700); color: var(--green-900); }
+.ficha-sector-btn.active { background: var(--green-700); border-color: var(--green-700); color: white; }
+.ficha-hero { background: linear-gradient(135deg, var(--navy-900), var(--navy-700)); color: white; border-radius: var(--r-md); padding: 24px 28px; margin-bottom: 16px; position: relative; overflow: hidden; }
+.ficha-hero::before { content: ''; position: absolute; top: -40px; right: -40px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(122,196,160,0.15), transparent); border-radius: 50%; }
+.ficha-hero-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--green-300); margin-bottom: 6px; }
+.ficha-hero-title { font-family: var(--font-serif); font-size: 30px; font-weight: 700; line-height: 1.1; margin-bottom: 6px; }
+.ficha-hero-sub { font-size: 13px; color: var(--navy-200); }
+.ficha-hero-stats { display: flex; gap: 32px; margin-top: 18px; flex-wrap: wrap; position: relative; z-index: 2; }
+.ficha-hero-stat-label { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--navy-200); }
+.ficha-hero-stat-val { font-family: var(--font-serif); font-size: 22px; font-weight: 700; color: white; line-height: 1; margin-top: 2px; }
+.ficha-cat-card { background: white; border-radius: var(--r-md); border: 1px solid var(--warm-300); padding: 16px 18px; box-shadow: var(--shadow-xs); }
+.ficha-cat-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--warm-200); }
+.ficha-cat-icon { width: 32px; height: 32px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; color: white; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+.ficha-cat-title { font-size: 13px; font-weight: 700; color: var(--navy-800); }
+.ficha-cat-sub { font-size: 10px; color: var(--gray-500); margin-top: 1px; }
+.ficha-metric { display: grid; grid-template-columns: 1fr 90px 60px; gap: 10px; align-items: center; padding: 6px 0; font-size: 12px; }
+.ficha-metric:not(:last-child) { border-bottom: 1px solid var(--warm-100); }
+.ficha-metric-label { color: var(--gray-700); }
+.ficha-metric-bar-track { height: 4px; background: var(--warm-300); border-radius: 2px; overflow: hidden; }
+.ficha-metric-bar-fill { height: 100%; transition: width 0.6s; border-radius: 2px; }
+.ficha-metric-val { font-weight: 700; color: var(--navy-800); font-variant-numeric: tabular-nums; text-align: right; font-family: var(--font-serif); font-size: 13px; }
+
+/* === NECESIDADES === */
+.need-card { background: white; border-radius: var(--r-md); border: 1px solid var(--warm-300); border-left: 4px solid; padding: 14px 16px; transition: all var(--t-fast); height: 100%; }
+.need-card:hover { box-shadow: var(--shadow-md); }
+.need-card.high { border-left-color: var(--red-700); }
+.need-card.med { border-left-color: var(--orange-700); }
+.need-card.low { border-left-color: var(--green-700); }
+.need-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+.need-icon { font-size: 24px; line-height: 1; }
+.need-title { font-size: 13px; font-weight: 700; color: var(--navy-800); flex: 1; line-height: 1.3; }
+.need-stat { font-family: var(--font-serif); font-size: 22px; font-weight: 700; color: var(--navy-800); white-space: nowrap; line-height: 1; }
+.need-stat.high { color: var(--red-700); }
+.need-stat.med { color: var(--orange-700); }
+.need-body { font-size: 11px; color: var(--gray-700); line-height: 1.5; margin-bottom: 8px; }
+.need-action { padding: 10px 12px; background: var(--green-50); border-radius: var(--r-sm); font-size: 11px; color: var(--navy-800); border-left: 3px solid var(--green-700); line-height: 1.5; }
+.need-action b { color: var(--green-900); }
+.need-sectors-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.need-sector-pill { background: var(--warm-200); color: var(--navy-700); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+.need-sector-pill.high { background: #FBE9E9; color: var(--red-700); }
 </style>
 </head>
 <body>
@@ -483,6 +553,8 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
   <div class="sidebar-icon" data-section="territorio" data-tooltip="Territorio" onclick="switchSection('territorio')">⬡</div>
   <div class="sidebar-icon" data-section="mapa" data-tooltip="Mapa interactivo" onclick="switchSection('mapa')">◉</div>
   <div class="sidebar-icon" data-section="equidad" data-tooltip="Decisión 2026" onclick="switchSection('equidad')">⚖</div>
+  <div class="sidebar-icon" data-section="ficha" data-tooltip="Ficha del sector" onclick="switchSection('ficha')">▤</div>
+  <div class="sidebar-icon" data-section="necesidades" data-tooltip="Necesidades operacionales" onclick="switchSection('necesidades')">⚡</div>
   <div class="sidebar-icon" data-section="riesgos" data-tooltip="Riesgos y prioridades" onclick="switchSection('riesgos')">⚠</div>
   <div class="sidebar-icon" data-section="actores" data-tooltip="Actores clave" onclick="switchSection('actores')">★</div>
 </aside>
@@ -994,6 +1066,36 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
   <div class="grid g-2" id="actores-list"></div>
 </section>
 
+
+<!-- FICHA DEL SECTOR -->
+<section class="section" id="sec-ficha">
+  <div class="section-head">
+    <div class="section-eyebrow">Realidad territorial · Censo INE 2024</div>
+    <h1 class="section-title">Ficha completa por sector</h1>
+    <p class="section-desc">Selecciona un sector para ver su realidad social en profundidad — demografía, vivienda, energía (leña), agua, conectividad, transporte. Datos base para diseñar intervenciones contextualizadas.</p>
+  </div>
+
+  <div class="ficha-selector" id="ficha-selector"></div>
+
+  <div id="ficha-content"></div>
+</section>
+
+<!-- NECESIDADES OPERACIONALES -->
+<section class="section" id="sec-necesidades">
+  <div class="section-head">
+    <div class="section-eyebrow">Decisión operacional · Donaciones y apoyos</div>
+    <h1 class="section-title">Necesidades detectadas en el territorio</h1>
+    <p class="section-desc">Cruces automáticos entre los datos del Censo INE y la cartera operacional. Sirven para identificar qué tipo de apoyo material hace sentido para cada sector — ya sea como donación en especie o como inversión social.</p>
+  </div>
+
+  <div class="info-note info mb-16">
+    <span class="icon">ℹ</span>
+    <div>Cada tarjeta cruza un indicador del Censo INE 2024 con una posible línea de apoyo operacional. Los sectores aparecen ordenados por urgencia. <b>No reemplaza el diálogo con la comunidad</b> — es una herramienta para priorizar conversaciones.</div>
+  </div>
+
+  <div class="grid g-3" id="needs-grid"></div>
+</section>
+
 </main>
 </div>
 </div>
@@ -1017,6 +1119,7 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3Ut01K8
 // ============== STATE ==============
 const state = {
   section: 'resumen',
+  fichaSector: null,
   selectedSectors: new Set(),
   selectedYears: new Set(),
   selectedTypes: new Set(),
@@ -2053,27 +2156,77 @@ const CHOROPLETH_CATS = {
   res:  { label: 'Residuos', color: '#7A7A75' }
 };
 
+const FEATURED_VARS = ['ivc', 'inv_per_capita', 'pct_indigena', 'pct_jef_fem', 'pct_cocina_lena', 'pct_sin_internet'];
+
 function buildVarSelector() {
   const wrap = $('#var-selector'); if (!wrap) return;
-  // Agrupar por categoría
+  const featured = FEATURED_VARS.map(k => CHOROPLETH_VARS.find(v => v.key === k)).filter(Boolean);
+  const featuredHTML = featured.map(v =>
+    `<button class="var-btn featured ${v.key === state.choroplethVar ? 'active' : ''}" data-var="${v.key}" onclick="changeChoroplethVar('${v.key}')">${v.label}</button>`
+  ).join('');
   const grouped = {};
-  CHOROPLETH_VARS.forEach(v => {
+  CHOROPLETH_VARS.filter(v => !FEATURED_VARS.includes(v.key)).forEach(v => {
     if (!grouped[v.cat]) grouped[v.cat] = [];
     grouped[v.cat].push(v);
   });
-  const html = Object.keys(grouped).map(catKey => {
-    const cat = CHOROPLETH_CATS[catKey] || { label: catKey, color: '#888' };
+  const groupOrder = ['base','demo','gen','edu','salud','viv','energ','agua','conect','trans','res'];
+  const dropdownHTML = groupOrder.filter(k => grouped[k]).map(catKey => {
+    const cat = CHOROPLETH_CATS[catKey];
     const buttons = grouped[catKey].map(v =>
       `<button class="var-btn ${v.key === state.choroplethVar ? 'active' : ''}" data-var="${v.key}" onclick="changeChoroplethVar('${v.key}')">${v.label}</button>`
     ).join('');
-    return `<div class="var-group"><div class="var-group-label" style="border-left:3px solid ${cat.color}">${cat.label}</div><div class="var-group-btns">${buttons}</div></div>`;
+    return `<div class="var-group"><div class="var-group-label" style="border-left-color:${cat.color}">${cat.label}</div><div class="var-group-btns">${buttons}</div></div>`;
   }).join('');
-  wrap.innerHTML = html;
+  const currentVar = CHOROPLETH_VARS.find(v => v.key === state.choroplethVar);
+  const currentName = currentVar ? currentVar.label : '—';
+  wrap.innerHTML = `
+    <div class="var-featured-row">
+      <div class="var-featured-label">Vars clave:</div>
+      <div class="var-featured-btns">${featuredHTML}</div>
+      <button class="var-more-btn" id="var-more-btn" onclick="toggleVarDropdown()">
+        <span>+45 vars INE</span><span class="caret">▾</span>
+      </button>
+    </div>
+    <div class="var-dropdown" id="var-dropdown">
+      <div class="var-dropdown-search">
+        <input type="text" id="var-search" placeholder="Buscar… (ej: leña, agua, internet)" oninput="filterVarDropdown()">
+      </div>
+      <div class="var-dropdown-content" id="var-dropdown-content">${dropdownHTML}</div>
+    </div>
+    <div class="var-current-info">
+      <span class="var-current-eyebrow">Mostrando:</span>
+      <span class="var-current-name">${currentName}</span>
+      ${currentVar && currentVar.desc ? `<span class="var-current-desc">${currentVar.desc}</span>` : ''}
+    </div>
+  `;
+}
+
+function toggleVarDropdown() {
+  const dd = $('#var-dropdown');
+  const btn = $('#var-more-btn');
+  if (dd) dd.classList.toggle('open');
+  if (btn) btn.classList.toggle('open');
+}
+
+function filterVarDropdown() {
+  const q = ($('#var-search').value || '').toLowerCase().trim();
+  $$('#var-dropdown-content .var-btn').forEach(b => {
+    const label = b.textContent.toLowerCase();
+    b.style.display = !q || label.includes(q) ? '' : 'none';
+  });
+  $$('#var-dropdown-content .var-group').forEach(g => {
+    const visibleBtns = [...g.querySelectorAll('.var-btn')].some(b => b.style.display !== 'none');
+    g.style.display = visibleBtns ? '' : 'none';
+  });
 }
 function changeChoroplethVar(k) {
   state.choroplethVar = k;
-  $$('.var-btn').forEach(b => b.classList.toggle('active', b.dataset.var === k));
+  buildVarSelector();
   renderChoropleth();
+  const dd = $('#var-dropdown');
+  if (dd) dd.classList.remove('open');
+  const btn = $('#var-more-btn');
+  if (btn) btn.classList.remove('open');
 }
 
 function getChoroplethColor(val, min, max, invert) {
@@ -2460,6 +2613,8 @@ function refreshAll() {
   else if (state.section === 'equidad') renderEquidad();
   else if (state.section === 'riesgos') renderRiesgos();
   else if (state.section === 'actores') renderActores();
+  else if (state.section === 'ficha') renderFicha();
+  else if (state.section === 'necesidades') renderNecesidades();
 }
 
 // ============== INIT ==============
@@ -2498,6 +2653,291 @@ async function init() {
   // Resize
   window.addEventListener('resize', () => setTimeout(refreshAll, 100));
 }
+
+
+
+// ============== FICHA DEL SECTOR ==============
+const FICHA_CATEGORIES = [
+  { key: 'demo',  label: 'Demografía',          icon: '👥', color: '#5A8AAD',
+    metrics: [
+      { k: 'pct_indigena',     l: '% Pueblo Originario',         max: 100, fmt: v => v.toFixed(1) + '%', invert: false, hi: 50, mi: 30 },
+      { k: 'pct_lengua_ind',   l: '% Habla lengua indígena',     max: 30,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 10, mi: 5 },
+      { k: 'pct_60_mas',       l: '% Adulto Mayor (60+)',        max: 50,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 25, mi: 15 },
+      { k: 'pct_0_17',         l: '% Niños y adolescentes',      max: 40,  fmt: v => v.toFixed(1) + '%', invert: true,  hi: 30, mi: 20 },
+      { k: 'prom_edad',        l: 'Edad promedio',               max: 60,  fmt: v => v.toFixed(1),       invert: false, hi: 50, mi: 40 }
+    ]},
+  { key: 'gen',   label: 'Género y hogar',      icon: '🏠', color: '#9B7F6B',
+    metrics: [
+      { k: 'pct_jef_fem',      l: '% Jefatura femenina',         max: 60,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 45, mi: 35 },
+      { k: 'pct_unipersonal',  l: '% Hogares unipersonales',     max: 50,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 30, mi: 20 },
+      { k: 'prom_per_hog',     l: 'Personas por hogar',          max: 5,   fmt: v => v.toFixed(2),       invert: true,  hi: 3, mi: 2.5 }
+    ]},
+  { key: 'edu',   label: 'Educación y trabajo', icon: '📚', color: '#2C7A5A',
+    metrics: [
+      { k: 'pct_analf',        l: '% Analfabetismo',             max: 15,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 7, mi: 4 },
+      { k: 'prom_escolaridad', l: 'Años de escolaridad',         max: 16,  fmt: v => v.toFixed(1) + ' años', invert: true, hi: 10, mi: 8 },
+      { k: 'pct_terciaria',    l: '% Educación superior',        max: 25,  fmt: v => v.toFixed(1) + '%', invert: true,  hi: 15, mi: 8 },
+      { k: 'pct_ocupado',      l: '% Ocupados',                  max: 70,  fmt: v => v.toFixed(1) + '%', invert: true,  hi: 50, mi: 40 },
+      { k: 'pct_desocupado',   l: '% Desocupados',               max: 10,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 5, mi: 2 }
+    ]},
+  { key: 'salud', label: 'Discapacidad',        icon: '♿', color: '#7E94AB',
+    metrics: [
+      { k: 'pct_discap',       l: '% Personas con discapacidad', max: 30,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 15, mi: 10 },
+      { k: 'pct_dif_ver',      l: '% Dificultad para ver',       max: 15,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 8, mi: 5 },
+      { k: 'pct_dif_oir',      l: '% Dificultad para oír',       max: 10,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 5, mi: 3 },
+      { k: 'pct_dif_mover',    l: '% Dificultad para moverse',   max: 15,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 8, mi: 5 }
+    ]},
+  { key: 'viv',   label: 'Vivienda',            icon: '🏚', color: '#B5947A',
+    metrics: [
+      { k: 'pct_haci',         l: '% Hacinamiento',              max: 20,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 8, mi: 4 },
+      { k: 'pct_irrecup',      l: '% Viviendas irrecuperables',  max: 15,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 5, mi: 2 },
+      { k: 'pct_deficit_viv',  l: '% Déficit habitacional',      max: 20,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 8, mi: 4 },
+      { k: 'pct_techo_zinc',   l: '% Techo de zinc',             max: 100, fmt: v => v.toFixed(1) + '%', invert: false, hi: 70, mi: 40 },
+      { k: 'pct_paredes_precarias', l: '% Paredes precarias',    max: 20,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 5, mi: 2 }
+    ]},
+  { key: 'energ', label: 'Energía',             icon: '🔥', color: '#C54A2A',
+    metrics: [
+      { k: 'pct_cocina_lena',  l: '% Cocina con leña',           max: 100, fmt: v => v.toFixed(1) + '%', invert: false, hi: 60, mi: 30 },
+      { k: 'pct_calef_lena',   l: '% Calefacción con leña',      max: 100, fmt: v => v.toFixed(1) + '%', invert: false, hi: 80, mi: 50 },
+      { k: 'pct_cocina_gas',   l: '% Cocina con gas',            max: 100, fmt: v => v.toFixed(1) + '%', invert: true,  hi: 60, mi: 30 },
+      { k: 'pct_cocina_pellet',l: '% Cocina con pellet',         max: 30,  fmt: v => v.toFixed(1) + '%', invert: true,  hi: 5, mi: 2 },
+      { k: 'pct_elect_solar',  l: '% Electricidad solar',        max: 30,  fmt: v => v.toFixed(1) + '%', invert: true,  hi: 5, mi: 2 },
+      { k: 'pct_sin_elect',    l: '% Sin electricidad',          max: 10,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 3, mi: 1 }
+    ]},
+  { key: 'agua',  label: 'Agua y saneamiento',  icon: '💧', color: '#5A8AAD',
+    metrics: [
+      { k: 'pct_agua_publica', l: '% Agua red pública',          max: 100, fmt: v => v.toFixed(1) + '%', invert: true,  hi: 70, mi: 50 },
+      { k: 'pct_agua_pozo',    l: '% Agua de pozo',              max: 50,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 20, mi: 10 },
+      { k: 'pct_agua_camion',  l: '% Agua camión aljibe',        max: 30,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 10, mi: 5 },
+      { k: 'pct_agua_rio',     l: '% Agua de río/vertiente',     max: 20,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 5, mi: 2 },
+      { k: 'pct_alcant',       l: '% Alcantarillado',            max: 100, fmt: v => v.toFixed(1) + '%', invert: true,  hi: 50, mi: 30 },
+      { k: 'pct_fosa',         l: '% Fosa séptica',              max: 100, fmt: v => v.toFixed(1) + '%', invert: false, hi: 60, mi: 30 },
+      { k: 'pct_acarreo_agua', l: '% Acarreo de agua',           max: 30,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 10, mi: 5 }
+    ]},
+  { key: 'conect',label: 'Conectividad',        icon: '📡', color: '#6B5E8A',
+    metrics: [
+      { k: 'pct_sin_internet',     l: '% Sin internet',          max: 60,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 30, mi: 15 },
+      { k: 'pct_internet_satelital', l: '% Internet satelital',  max: 30,  fmt: v => v.toFixed(1) + '%', invert: true,  hi: 5, mi: 2 },
+      { k: 'pct_internet_fija',    l: '% Internet fija',         max: 80,  fmt: v => v.toFixed(1) + '%', invert: true,  hi: 50, mi: 25 }
+    ]},
+  { key: 'trans', label: 'Transporte',          icon: '🛶', color: '#9B7F6B',
+    metrics: [
+      { k: 'pct_trans_bote',   l: '% Se mueve en bote/lancha',   max: 30,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 10, mi: 3 },
+      { k: 'pct_trans_camina', l: '% Camina al trabajo/estudio', max: 30,  fmt: v => v.toFixed(1) + '%', invert: false, hi: 10, mi: 5 },
+      { k: 'pct_trans_publico',l: '% Transporte público',        max: 30,  fmt: v => v.toFixed(1) + '%', invert: true,  hi: 15, mi: 8 }
+    ]},
+  { key: 'res',   label: 'Residuos',            icon: '♻',  color: '#7A7A75',
+    metrics: [
+      { k: 'pct_basura_servicio',  l: '% Retiro municipal',      max: 100, fmt: v => v.toFixed(1) + '%', invert: true,  hi: 70, mi: 40 },
+      { k: 'pct_basura_entierra',  l: '% Entierra basura',       max: 100, fmt: v => v.toFixed(1) + '%', invert: false, hi: 40, mi: 20 }
+    ]}
+];
+
+function metricColor(v, m) {
+  if (v == null) return '#ccc';
+  if (m.invert) {
+    if (v < m.mi) return '#A32D2D';
+    if (v < m.hi) return '#E37050';
+    return '#2C7A5A';
+  } else {
+    if (v >= m.hi) return '#A32D2D';
+    if (v >= m.mi) return '#E37050';
+    return '#2C7A5A';
+  }
+}
+
+function renderFicha() {
+  const wrap = $('#ficha-selector'); if (!wrap) return;
+  if (!state.fichaSector) state.fichaSector = (DATA.censo_full && DATA.censo_full[0]) ? DATA.censo_full[0].sector : null;
+  const sectores = (DATA.censo_full || []).map(c => c.sector).sort();
+  wrap.innerHTML = `<span class="ficha-selector-label">Sector</span>` +
+    sectores.map(s => `<button class="ficha-sector-btn ${s === state.fichaSector ? 'active' : ''}" onclick="selectFichaSector('${s.replace(/'/g,'')}')">${s}</button>`).join('');
+  renderFichaContent();
+}
+
+function selectFichaSector(s) {
+  state.fichaSector = s;
+  renderFicha();
+}
+
+function renderFichaContent() {
+  const wrap = $('#ficha-content'); if (!wrap) return;
+  const s = (DATA.censo_full || []).find(c => c.sector === state.fichaSector);
+  if (!s) { wrap.innerHTML = '<div class="info-note warn">No hay datos para este sector.</div>'; return; }
+
+  // Inversión asociada
+  const orgsSector = DATA.orgs.filter(o => o.sector_r === s.sector || o.sector === s.sector);
+  const invTotal = orgsSector.reduce((sum, o) => sum + o.monto, 0);
+  const nIniciativas = orgsSector.reduce((sum, o) => sum + o.n, 0);
+
+  // Hero
+  let html = `
+    <div class="ficha-hero">
+      <div class="ficha-hero-eyebrow">Calbuco · Los Lagos · Censo INE 2024</div>
+      <div class="ficha-hero-title">${escapeHtml(s.sector)}</div>
+      <div class="ficha-hero-sub">${s.pob.toFixed(0)} habitantes · ${s.n_hog.toFixed(0)} hogares · ${s.n_hombres.toFixed(0)}♂ / ${s.n_mujeres.toFixed(0)}♀</div>
+      <div class="ficha-hero-stats">
+        <div><div class="ficha-hero-stat-label">Inversión INVERMAR</div><div class="ficha-hero-stat-val">${fmtCLP(invTotal)}</div></div>
+        <div><div class="ficha-hero-stat-label">Iniciativas</div><div class="ficha-hero-stat-val">${nIniciativas}</div></div>
+        <div><div class="ficha-hero-stat-label">Edad promedio</div><div class="ficha-hero-stat-val">${s.prom_edad.toFixed(1)} años</div></div>
+        <div><div class="ficha-hero-stat-label">% Pueblo originario</div><div class="ficha-hero-stat-val">${s.pct_indigena.toFixed(1)}%</div></div>
+      </div>
+    </div>
+  `;
+
+  // Cards por categoría
+  html += '<div class="grid g-2">';
+  FICHA_CATEGORIES.forEach(cat => {
+    const metricsHTML = cat.metrics.map(m => {
+      const val = s[m.k];
+      if (val == null) return `<div class="ficha-metric"><div class="ficha-metric-label">${m.l}</div><div></div><div class="ficha-metric-val text-mute">—</div></div>`;
+      const w = Math.min(100, (val / m.max) * 100);
+      const color = metricColor(val, m);
+      return `<div class="ficha-metric">
+        <div class="ficha-metric-label">${m.l}</div>
+        <div class="ficha-metric-bar-wrap"><div class="ficha-metric-bar-track"><div class="ficha-metric-bar-fill" style="width:${w}%;background:${color}"></div></div></div>
+        <div class="ficha-metric-val">${m.fmt(val)}</div>
+      </div>`;
+    }).join('');
+    html += `
+      <div class="ficha-cat-card">
+        <div class="ficha-cat-head">
+          <div class="ficha-cat-icon" style="background:${cat.color}">${cat.icon}</div>
+          <div>
+            <div class="ficha-cat-title">${cat.label}</div>
+            <div class="ficha-cat-sub">${cat.metrics.length} indicadores</div>
+          </div>
+        </div>
+        ${metricsHTML}
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  wrap.innerHTML = html;
+}
+
+// ============== NECESIDADES OPERACIONALES ==============
+const NEEDS_RULES = [
+  {
+    icon: '🔥', metric: 'pct_cocina_lena', label: 'Cocina y calefacción con leña',
+    threshold: 60, format: v => v.toFixed(0) + '%',
+    desc: 'Alto uso de leña indica vulnerabilidad energética y exposición a contaminación intradomiciliaria.',
+    action: 'Donación de <b>cocinas eficientes a pellet</b>, recuperadores de calor, secadores solares de leña, o colaboración con programa "Calefacción Sustentable" del MMA.',
+    threshHigh: 70, threshMed: 50
+  },
+  {
+    icon: '💧', metric: 'pct_agua_pozo', label: 'Agua de pozo o noria',
+    threshold: 15, format: v => v.toFixed(0) + '%',
+    desc: 'Hogares dependientes de pozos están expuestos a contaminación, sequía y variabilidad de calidad.',
+    action: 'Apoyar análisis fisicoquímicos del agua, donación de <b>filtros y purificadores</b>, o coordinación con APR locales.',
+    threshHigh: 25, threshMed: 15
+  },
+  {
+    icon: '🚛', metric: 'pct_agua_camion', label: 'Agua por camión aljibe',
+    threshold: 5, format: v => v.toFixed(0) + '%',
+    desc: 'Sectores con camión aljibe son los más vulnerables a sequía. Indica falta de red estable.',
+    action: '<b>Estanques de acopio domiciliario</b>, capacitación en uso responsable, o apoyo a la gestión municipal del aljibe.',
+    threshHigh: 10, threshMed: 5
+  },
+  {
+    icon: '📡', metric: 'pct_sin_internet', label: 'Hogares sin internet',
+    threshold: 25, format: v => v.toFixed(0) + '%',
+    desc: 'La brecha digital limita el acceso a educación, salud, y trámites. Especial impacto en escuelas rurales.',
+    action: 'Donación de <b>internet satelital</b> (como ya hace INVERMAR en algunas zonas), tablets para escuelas, o apoyo en infraestructura de antenas.',
+    threshHigh: 35, threshMed: 20
+  },
+  {
+    icon: '🛶', metric: 'pct_trans_bote', label: 'Insularidad práctica · transporte en bote',
+    threshold: 5, format: v => v.toFixed(0) + '%',
+    desc: 'Personas que dependen de bote/lancha para movilizarse — clase, salud, comercio.',
+    action: '<b>Apoyo a transporte marítimo</b> escolar, donación de chalecos salvavidas, mejora de embarcaderos, GPS para pescadores.',
+    threshHigh: 10, threshMed: 3
+  },
+  {
+    icon: '🏚', metric: 'pct_techo_zinc', label: 'Techos de zinc',
+    threshold: 70, format: v => v.toFixed(0) + '%',
+    desc: 'Predominio de zinc indica viviendas vulnerables a frío/calor, ruido y deterioro estructural.',
+    action: 'Convenios para <b>aislación térmica</b>, donación de materiales de construcción, jornadas de mantención comunitaria.',
+    threshHigh: 80, threshMed: 60
+  },
+  {
+    icon: '♻', metric: 'pct_basura_entierra', label: 'Manejo de residuos sin retiro',
+    threshold: 30, format: v => v.toFixed(0) + '%',
+    desc: 'Sectores donde la basura se entierra o quema, sin servicio municipal regular.',
+    action: 'Apoyar <b>compostaje comunitario</b>, puntos limpios, capacitación en reciclaje, gestión con la municipalidad.',
+    threshHigh: 50, threshMed: 25
+  },
+  {
+    icon: '👵', metric: 'pct_60_mas', label: 'Población adulta mayor',
+    threshold: 20, format: v => v.toFixed(0) + '%',
+    desc: 'Sectores con alta proporción de adultos mayores requieren atención específica en salud, accesibilidad y compañía.',
+    action: '<b>Operativos de salud rural</b>, mejora de postas, transporte para controles médicos, talleres intergeneracionales.',
+    threshHigh: 25, threshMed: 18
+  },
+  {
+    icon: '🪶', metric: 'pct_indigena', label: 'Población de pueblos originarios',
+    threshold: 50, format: v => v.toFixed(0) + '%',
+    desc: 'Alta presencia mapuche-huilliche requiere respeto al Convenio 169 y acuerdos con comunidades indígenas.',
+    action: '<b>Consulta indígena previa</b> en cualquier intervención, apoyo a iniciativas culturales, ECMPO, recuperación de lengua y trafkintu.',
+    threshHigh: 60, threshMed: 40
+  },
+  {
+    icon: '👩', metric: 'pct_jef_fem', label: 'Jefatura femenina de hogar',
+    threshold: 45, format: v => v.toFixed(0) + '%',
+    desc: 'Alto porcentaje de mujeres jefas de hogar — un grupo prioritario para apoyo productivo.',
+    action: 'Apoyo a <b>emprendimientos liderados por mujeres</b>, capacitación productiva, fondos específicos para colectivos femeninos.',
+    threshHigh: 50, threshMed: 42
+  },
+  {
+    icon: '📚', metric: 'pct_analf', label: 'Analfabetismo',
+    threshold: 5, format: v => v.toFixed(1) + '%',
+    desc: 'Sectores donde existe población adulta sin lectoescritura — limita acceso a derechos y oportunidades.',
+    action: 'Apoyar <b>programas de alfabetización</b> de adultos (Chile Crece, Plan ABC), donación de material educativo.',
+    threshHigh: 7, threshMed: 4
+  },
+  {
+    icon: '♿', metric: 'pct_discap', label: 'Personas con discapacidad',
+    threshold: 12, format: v => v.toFixed(1) + '%',
+    desc: 'Sectores con alta proporción de personas con discapacidad necesitan accesibilidad y apoyo específico.',
+    action: '<b>Ayudas técnicas</b> (sillas, audífonos, bastones), accesibilidad en infraestructura comunitaria, transporte adaptado.',
+    threshHigh: 15, threshMed: 10
+  }
+];
+
+function renderNecesidades() {
+  const wrap = $('#needs-grid'); if (!wrap || !DATA.censo_full) return;
+  const cards = NEEDS_RULES.map(rule => {
+    // Sectores afectados ordenados por valor
+    const affected = DATA.censo_full
+      .map(c => ({ sector: c.sector, val: c[rule.metric] }))
+      .filter(x => x.val != null && x.val >= rule.threshold)
+      .sort((a, b) => b.val - a.val);
+    if (!affected.length) return null;
+    const top = affected[0];
+    const level = top.val >= rule.threshHigh ? 'high' : top.val >= rule.threshMed ? 'med' : 'low';
+    const sectorPills = affected.map(s => {
+      const lvl = s.val >= rule.threshHigh ? 'high' : '';
+      return `<span class="need-sector-pill ${lvl}">${escapeHtml(s.sector)} ${rule.format(s.val)}</span>`;
+    }).join('');
+    return `
+      <div class="need-card ${level}">
+        <div class="need-head">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="need-icon">${rule.icon}</div>
+            <div class="need-title">${rule.label}</div>
+          </div>
+          <div class="need-stat ${level}">${rule.format(top.val)}</div>
+        </div>
+        <div class="need-body">${rule.desc} <b>Sector más afectado: ${escapeHtml(top.sector)}.</b></div>
+        <div class="need-action">→ ${rule.action}</div>
+        <div class="need-sectors-list">${sectorPills}</div>
+      </div>
+    `;
+  }).filter(Boolean).join('');
+  wrap.innerHTML = cards || '<div class="info-note success">No se detectan necesidades urgentes con los umbrales actuales.</div>';
+}
+
 
 document.addEventListener('DOMContentLoaded', init);
 
