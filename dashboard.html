@@ -542,6 +542,8 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 .need-sectors-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
 .need-sector-pill { background: var(--warm-200); color: var(--navy-700); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
 .need-sector-pill.high { background: #FBE9E9; color: var(--red-700); }
+
+.filter-desc { font-size: 11px; color: var(--gray-500); font-style: italic; margin-left: auto; padding: 4px 12px; }
 </style>
 </head>
 <body>
@@ -584,15 +586,16 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 
 <!-- ============== FILTERBAR ============== -->
 <div class="filterbar">
-  <div class="filter-block">
+  <div class="filter-block filter-sector-block">
     <span class="filter-label">Sector</span>
     <div class="chip-group" id="sector-chips"></div>
   </div>
-  <div class="filter-block">
+  <div class="filter-block filter-year-block">
     <span class="filter-label">Año</span>
     <div class="chip-group" id="year-chips"></div>
   </div>
   <input type="text" class="search-input" id="search-input" placeholder="Buscar organización, tipo o categoría…">
+  <span class="filter-desc" id="filter-desc"></span>
   <span class="clear-link" onclick="clearAllFilters()">Limpiar filtros</span>
 </div>
 
@@ -1117,6 +1120,19 @@ DATA.orgs = DATA.orgs || [];
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3Ut01K8QGBbQOELVydHp0MWGs1FAm8a7l3Vtp-3YjwdwLtMNSjf4kBkSRHPFWdmRRXuNsv1jocdM-/pub?output=csv';
 
 // ============== STATE ==============
+// Config: qué filtros aplican a cada sección
+const SECTION_FILTERS = {
+  resumen:     { sector: true,  year: true,  search: true,  desc: 'Filtros activos en todos los gráficos' },
+  inversion:   { sector: true,  year: true,  search: true,  desc: 'Filtros activos en todos los gráficos' },
+  territorio:  { sector: true,  year: false, search: false, desc: 'Sólo aplica filtro de sector — el censo no tiene dimensión temporal' },
+  mapa:        { sector: true,  year: false, search: false, desc: 'Filtro de sector resalta puntos del territorio elegido' },
+  equidad:     { sector: false, year: false, search: false, desc: 'Compara los 9 sectores entre sí — no admite filtros' },
+  riesgos:     { sector: false, year: false, search: false, desc: 'Cartera 2026 fija — diagnóstico cualitativo' },
+  ficha:       { sector: false, year: false, search: false, desc: 'Tiene su propio selector de sector' },
+  necesidades: { sector: false, year: false, search: false, desc: 'Recomendaciones aplican a los 9 sectores' },
+  actores:     { sector: false, year: false, search: false, desc: 'Personas individualizadas — no admite filtros' }
+};
+
 const state = {
   section: 'resumen',
   fichaSector: null,
@@ -1556,6 +1572,7 @@ function toggleSector(s) {
   if (state.selectedSectors.has(s)) state.selectedSectors.delete(s);
   else state.selectedSectors.add(s);
   $$('.chip[data-sector]').forEach(c => c.classList.toggle('active', state.selectedSectors.has(c.dataset.sector)));
+  if (state.section === 'mapa' && mapInstance) renderMapMarkers();
   refreshAll();
 }
 function toggleYear(y) {
@@ -1796,7 +1813,16 @@ function renderTerritorio() {
 
 function renderChartPob() {
   const ctx = $('#chart-pob'); if (!ctx) return;
-  const data = [...DATA.censo].sort((a,b) => b.pob - a.pob);
+  let data = [...DATA.censo].sort((a,b) => b.pob - a.pob);
+  // Aplicar filtro de sector si está activo
+  if (state.selectedSectors.size > 0) {
+    data = data.filter(d => state.selectedSectors.has(d.sector));
+  }
+  if (!data.length) {
+    destroyChart('pob');
+    ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+    return;
+  }
   destroyChart('pob');
   charts.pob = new Chart(ctx, {
     type: 'bar',
@@ -1823,10 +1849,18 @@ function renderChartScatter() {
   const ctx = $('#chart-scatter'); if (!ctx) return;
   const map = {};
   DATA.orgs.forEach(o => { map[o.sector_r] = map[o.sector_r] || { monto: 0, n: 0 }; map[o.sector_r].monto += o.monto; map[o.sector_r].n += o.n; });
-  const points = DATA.censo.map(c => {
+  let censoUsed = DATA.censo;
+  if (state.selectedSectors.size > 0) {
+    censoUsed = DATA.censo.filter(c => state.selectedSectors.has(c.sector));
+  }
+  const points = censoUsed.map(c => {
     const inv = map[c.sector] || { monto: 0, n: 0 };
     return { x: c.pob, y: inv.monto/1e6, r: Math.max(5, Math.min(22, inv.n)), label: c.sector };
   }).filter(p => p.y > 0);
+  if (!points.length) {
+    destroyChart('scatter');
+    return;
+  }
 
   // Regresión lineal pob → inv
   const n = points.length;
@@ -1919,8 +1953,13 @@ function renderTipologias() {
 
 function renderTopOrgsEvolution() {
   const ctx = $('#chart-top-orgs'); if (!ctx) return;
-  // Top 8 orgs por monto, evolución anual REAL (no estimada)
-  const orgsTop = [...DATA.orgs].sort((a,b)=>b.monto-a.monto).slice(0, 8);
+  // Top 8 orgs por monto, filtradas por sector si aplica
+  let orgsBase = DATA.orgs;
+  if (state.selectedSectors.size > 0) {
+    orgsBase = DATA.orgs.filter(o => state.selectedSectors.has(o.sector_r));
+  }
+  const orgsTop = [...orgsBase].sort((a,b)=>b.monto-a.monto).slice(0, 8);
+  if (!orgsTop.length) { destroyChart('topOrgs'); return; }
   const years = [2022, 2023, 2024, 2025];
   const palette = ['#1A2F4A','#2C7A5A','#C54A2A','#5A8AAD','#B5947A','#8FA3BD','#9B7F6B','#7E94AB'];
   const datasets = orgsTop.map((org, i) => {
@@ -1961,11 +2000,11 @@ function renderTopOrgsEvolution() {
 let mapInstance = null;
 let mapMarkers = [];
 
-function makeMarkerIcon(tipo, monto, isRef) {
+function makeMarkerIcon(tipo, monto, isRef, isOutOfFilter) {
   const cfg = getTypeCfg(tipo);
   const size = isRef ? 22 : Math.max(26, Math.min(50, 26 + Math.sqrt(monto / 250000)));
   const fontSize = Math.max(9, Math.min(13, size * 0.32));
-  const opacity = isRef ? 0.55 : 1;
+  const opacity = isOutOfFilter ? 0.3 : (isRef ? 0.55 : 1);
   const border = isRef ? `1.5px dashed ${cfg.color}` : `2.5px solid ${cfg.color}`;
   const bg = isRef ? 'white' : cfg.bg;
   const shadow = isRef ? 'none' : '0 2px 8px rgba(0,0,0,0.18)';
@@ -2045,11 +2084,14 @@ function renderMapMarkers() {
     if (state.mapMode === 'ref' && p.monto > 0) return false;
     return true;
   });
+  // Sectores activos para resaltar
+  const activeSectors = state.selectedSectors;
 
   filtered.forEach(p => {
     const isRef = p.monto === 0;
-    const icon = makeMarkerIcon(p.tipo, p.monto, isRef);
-    const m = L.marker([p.lat, p.lng], { icon }).addTo(mapInstance);
+    const isOutOfFilter = activeSectors.size > 0 && !activeSectors.has(p.sector);
+    const icon = makeMarkerIcon(p.tipo, p.monto, isRef, isOutOfFilter);
+    const m = L.marker([p.lat, p.lng], { icon, opacity: isOutOfFilter ? 0.25 : 1, zIndexOffset: isOutOfFilter ? -100 : 0 }).addTo(mapInstance);
     const cfg = getTypeCfg(p.tipo);
     const montoStr = isRef
       ? `<div style="font-size:11px;color:#9A9A95;margin:6px 0;font-style:italic;">Ubicación de referencia</div>`
@@ -2598,7 +2640,29 @@ function switchSection(name) {
   state.section = name;
   $$('.sidebar-icon').forEach(i => i.classList.toggle('active', i.dataset.section === name));
   $$('.section').forEach(s => s.classList.toggle('active', s.id === 'sec-' + name));
+  applyFilterVisibility();
   refreshAll();
+}
+
+function applyFilterVisibility() {
+  const cfg = SECTION_FILTERS[state.section] || { sector: true, year: true, search: true };
+  const filterbar = document.querySelector('.filterbar');
+  if (!filterbar) return;
+  // Si NINGÚN filtro aplica, ocultar barra entera
+  const anyApplies = cfg.sector || cfg.year || cfg.search;
+  filterbar.style.display = anyApplies ? '' : 'none';
+  // Mostrar/ocultar bloques específicos
+  const sectorBlock = document.querySelector('.filter-sector-block');
+  const yearBlock   = document.querySelector('.filter-year-block');
+  const searchEl    = document.querySelector('#search-input');
+  const descEl      = document.querySelector('#filter-desc');
+  if (sectorBlock) sectorBlock.style.display = cfg.sector ? '' : 'none';
+  if (yearBlock)   yearBlock.style.display   = cfg.year ? '' : 'none';
+  if (searchEl)    searchEl.style.display    = cfg.search ? '' : 'none';
+  if (descEl) {
+    descEl.textContent = cfg.desc || '';
+    descEl.style.display = anyApplies ? '' : 'none';
+  }
 }
 
 function refreshAll() {
@@ -2634,6 +2698,7 @@ async function init() {
 
   buildFilterBar();
   buildVarSelector();
+  applyFilterVisibility();
   refreshAll();
 
   // Search
