@@ -1987,6 +1987,7 @@ async function loadFromSheet() {
 
 function enrichSectoresWithInversion() {
   if (!DATA.sectores_poly || !DATA.bbdd) return;
+  // Marcar como enriquecido
   // Contar inversión por sector usando BBDD + reclasificación
   const bySector = {};
   DATA.bbdd.forEach(r => {
@@ -2013,6 +2014,12 @@ function enrichSectoresWithInversion() {
     const pctIvc = (s.ivc / totalIvc) * 100;
     s.gap_equidad = Math.round(pctInv - pctIvc);
   });
+  // Re-renderizar la sección activa si depende de censo_full enriquecido
+  DATA._enriched = true;
+  const dependentSections = ['necesidades', 'equidad', 'ficha', 'territorio', 'mapa'];
+  if (typeof state !== 'undefined' && dependentSections.includes(state.section) && typeof refreshAll === 'function') {
+    setTimeout(() => refreshAll(), 50);
+  }
 }
 
 function rebuildOrgsFromBBDD() {
@@ -3885,7 +3892,18 @@ function renderNecesidades() {
   // Defensa: si DATA.censo_full no está listo, retry
   if (!DATA.censo_full || !DATA.censo_full.length) {
     wrap.innerHTML = '<div class="info-note warn"><span class="icon">⏳</span><div>Cargando datos del Censo INE…</div></div>';
-    setTimeout(() => { if (DATA.censo_full && DATA.censo_full.length) renderNecesidades(); }, 500);
+    let attempts = 0;
+    const retry = () => {
+      attempts++;
+      if (DATA.censo_full && DATA.censo_full.length) {
+        renderNecesidades();
+      } else if (attempts < 10) {
+        setTimeout(retry, 300);
+      } else {
+        wrap.innerHTML = '<div class="info-note warn"><span class="icon">⚠</span><div>No se pudieron cargar los datos del Censo INE. Revisa la conexión.</div></div>';
+      }
+    };
+    setTimeout(retry, 300);
     return;
   }
   // Calcular dataset enriquecido con métricas
