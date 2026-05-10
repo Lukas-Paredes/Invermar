@@ -928,6 +928,49 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 
 .ficha-sector-btn.pilot { border-color: var(--green-500); color: var(--green-900); font-weight: 700; }
 .ficha-sector-btn.pilot:not(.active) { background: var(--green-50); }
+
+/* === BOTONES TOGGLE 'Todos/Ninguno' === */
+.filter-toggle-btn {
+  padding: 5px 11px;
+  background: white;
+  border: 1px solid var(--navy-700);
+  color: var(--navy-700);
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all var(--t-fast);
+  font-family: var(--font-sans);
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+.filter-toggle-btn:hover {
+  background: var(--navy-700);
+  color: white;
+}
+.filter-toggle-btn:active {
+  transform: scale(0.96);
+}
+
+.filter-toggle-mini {
+  padding: 2px 8px;
+  background: transparent;
+  border: 1px solid var(--gray-400);
+  color: var(--gray-700);
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--t-fast);
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+}
+.filter-toggle-mini:hover {
+  background: var(--navy-700);
+  color: white;
+  border-color: var(--navy-700);
+}
 </style>
 </head>
 <body>
@@ -976,10 +1019,12 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
   <div class="filter-block filter-sector-block">
     <span class="filter-label">Sector</span>
     <div class="chip-group" id="sector-chips"></div>
+    <button class="filter-toggle-btn" onclick="toggleAllSectors()" title="Activar/desactivar todos">Todos</button>
   </div>
   <div class="filter-block filter-year-block">
     <span class="filter-label">Año</span>
     <div class="chip-group" id="year-chips"></div>
+    <button class="filter-toggle-btn" onclick="toggleAllYears()" title="Activar/desactivar todos">Todos</button>
   </div>
   <input type="text" class="search-input" id="search-input" placeholder="Buscar organización, tipo o categoría…">
   <span class="filter-desc" id="filter-desc"></span>
@@ -1487,7 +1532,10 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
         <label class="map-radio"><input type="radio" name="map-mode" value="all" checked onchange="setMapMode('all')"> Todos los puntos</label>
         <label class="map-radio"><input type="radio" name="map-mode" value="real" onchange="setMapMode('real')"> Solo con inversión</label>
         <label class="map-radio"><input type="radio" name="map-mode" value="ref" onchange="setMapMode('ref')"> Solo referenciales</label>
-        <h6>Filtrar por tipo</h6>
+        <h6 style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Filtrar por tipo</span>
+          <button class="filter-toggle-mini" onclick="toggleAllMapTypes()">Todos</button>
+        </h6>
         <div id="map-type-filters"></div>
       </div>
       <div class="map-info"><span id="map-info-text">Cargando…</span></div>
@@ -1594,6 +1642,7 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
       <div class="card-head">
         <div class="card-eyebrow">FILTRAR ACCIONES</div>
         <div class="card-title">Por grupo estratégico</div>
+        <div class="card-sub" style="margin-top:6px;"><button class="filter-toggle-btn" onclick="toggleAllRiskGroups()" style="margin-top:4px;">Todos / Ninguno</button></div>
       </div>
       <div class="card-body">
         <div class="flex-col gap-8">
@@ -2282,6 +2331,55 @@ function clearAllFilters() {
   $$('.chip[data-sector], .chip[data-year]').forEach(c => c.classList.remove('active'));
   $('#search-input').value = '';
   refreshAll();
+}
+
+function toggleAllSectors() {
+  // Si hay alguno seleccionado, vacía. Si no hay ninguno, selecciona todos.
+  const sectores = [...new Set(DATA.orgs.map(o => o.sector_r))];
+  if (state.selectedSectors.size > 0) {
+    state.selectedSectors.clear();
+  } else {
+    sectores.forEach(s => state.selectedSectors.add(s));
+  }
+  $$('.chip[data-sector]').forEach(c => c.classList.toggle('active', state.selectedSectors.has(c.dataset.sector)));
+  if (state.section === 'mapa' && mapInstance) renderMapMarkers();
+  refreshAll();
+}
+
+function toggleAllYears() {
+  const years = [...new Set(DATA.bbdd.map(r => r.year).filter(Boolean))];
+  if (state.selectedYears.size > 0) {
+    state.selectedYears.clear();
+  } else {
+    years.forEach(y => state.selectedYears.add(y));
+  }
+  $$('.chip[data-year]').forEach(c => c.classList.toggle('active', state.selectedYears.has(parseInt(c.dataset.year))));
+  refreshAll();
+}
+
+function toggleAllMapTypes() {
+  const types = [...new Set(DATA.mapa.map(p => p.tipo))].filter(t => t !== 'Planta operaciones');
+  if (state.mapTypeFilter.size > 0) {
+    state.mapTypeFilter.clear();
+  } else {
+    types.forEach(t => state.mapTypeFilter.add(t));
+  }
+  // Actualizar checkboxes
+  $$('.map-check input').forEach(input => {
+    const label = input.parentElement.textContent.trim();
+    input.checked = state.mapTypeFilter.has(label) || [...state.mapTypeFilter].some(t => label.includes(t));
+  });
+  renderMapMarkers();
+}
+
+function toggleAllRiskGroups() {
+  if (state.selectedGroups.size === 3) {
+    state.selectedGroups.clear();
+  } else {
+    state.selectedGroups = new Set(['A','B','C']);
+  }
+  $$('.group-check').forEach(c => c.checked = state.selectedGroups.has(c.dataset.group));
+  if (state.section === 'riesgos') { renderRiskMatrix(); renderPriorityList(); }
 }
 
 // ============== INVERSION SECTION ==============
@@ -3783,7 +3881,13 @@ const NEEDS_RULES = [
 ];
 
 function renderNecesidades() {
-  const wrap = $('#needs-grid'); if (!wrap || !DATA.censo_full) return;
+  const wrap = $('#needs-grid'); if (!wrap) return;
+  // Defensa: si DATA.censo_full no está listo, retry
+  if (!DATA.censo_full || !DATA.censo_full.length) {
+    wrap.innerHTML = '<div class="info-note warn"><span class="icon">⏳</span><div>Cargando datos del Censo INE…</div></div>';
+    setTimeout(() => { if (DATA.censo_full && DATA.censo_full.length) renderNecesidades(); }, 500);
+    return;
+  }
   // Calcular dataset enriquecido con métricas
   const enriched = NEEDS_RULES.map(rule => {
     const affected = DATA.censo_full
