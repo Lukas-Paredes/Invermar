@@ -1453,12 +1453,12 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 
   <div class="card mt-16">
     <div class="card-head">
-      <div class="card-eyebrow">EVOLUCIÓN POR ORGANIZACIÓN</div>
-      <div class="card-title">Top 8 organizaciones · inversión real por año</div>
-      <div class="card-sub">Datos exactos de la BBDD (no estimados). El Sindicato Los Cisnes domina el gráfico — eso ES el hallazgo.</div>
+      <div class="card-eyebrow">CONCENTRACIÓN DE INVERSIÓN</div>
+      <div class="card-title">Top 8 organizaciones · inversión por año</div>
+      <div class="card-sub">Barras apiladas: el largo total = inversión acumulada de la organización · cada color = año. El Sindicato Los Cisnes y Escuela Aguantao concentran más del 50% del total.</div>
     </div>
     <div class="card-body">
-      <div class="chart-box tall"><canvas id="chart-top-orgs"></canvas></div>
+      <div class="chart-box" style="height:420px"><canvas id="chart-top-orgs"></canvas></div>
     </div>
   </div>
 
@@ -1732,7 +1732,7 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
     <small>CARLOS PEÑALVA · APR AUCHA NORTE + CONSEJO RESOLUTIVO SALUD</small>
   </div>
 
-  <h3 style="margin: 24px 0 12px; font-family: var(--font-serif); font-size: 18px; color: var(--navy-800);">Las 6 lideresas</h3>
+  <h3 style="margin: 24px 0 12px; font-family: var(--font-serif); font-size: 18px; color: var(--navy-800);">Actores estratégicos identificados</h3>
   <div class="grid g-3" id="actores-list"></div>
 </section>
 
@@ -2760,36 +2760,66 @@ function renderTopOrgsEvolution() {
   const orgsTop = [...orgsBase].sort((a,b)=>b.monto-a.monto).slice(0, 8);
   if (!orgsTop.length) { destroyChart('topOrgs'); return; }
   const years = [2022, 2023, 2024, 2025];
-  const palette = ['#1A2F4A','#2C7A5A','#C54A2A','#5A8AAD','#B5947A','#8FA3BD','#9B7F6B','#7E94AB'];
-  const datasets = orgsTop.map((org, i) => {
-    const data = years.map(y => {
-      const total = DATA.bbdd.filter(r => r.org === org.org && r.year === y).reduce((s,r)=>s+r.monto, 0);
-      return total / 1e6;
-    });
-    return {
-      label: org.org.length > 32 ? org.org.slice(0, 30) + '…' : org.org,
-      data,
-      borderColor: palette[i],
-      backgroundColor: palette[i] + '15',
-      borderWidth: 2,
-      pointRadius: 4, pointHoverRadius: 7,
-      tension: 0.3, fill: false
-    };
+  // Color por año (más claro a más oscuro)
+  const yearColors = { 2022: '#C7D2DE', 2023: '#7E94AB', 2024: '#3D5A7F', 2025: '#0F1E33' };
+
+  // Etiquetas cortas
+  const labels = orgsTop.map(o => {
+    const name = o.org;
+    if (name.length > 28) return name.slice(0, 26) + '…';
+    return name;
   });
+
+  // Datasets: una serie por año (barras apiladas horizontales)
+  const datasets = years.map(y => ({
+    label: String(y),
+    data: orgsTop.map(org =>
+      DATA.bbdd.filter(r => r.org === org.org && r.year === y).reduce((s,r)=>s+r.monto, 0) / 1e6
+    ),
+    backgroundColor: yearColors[y],
+    borderColor: 'white',
+    borderWidth: 1,
+    borderRadius: 3,
+    barPercentage: 0.85,
+    categoryPercentage: 0.85
+  }));
+
   destroyChart('topOrgs');
   charts.topOrgs = new Chart(ctx, {
-    type: 'line',
-    data: { labels: years.map(String), datasets },
+    type: 'bar',
+    data: { labels, datasets },
     options: {
+      indexAxis: 'y',
       responsive: true, maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 }, padding: 6 } },
-        tooltip: { callbacks: { label: c => c.parsed.y > 0 ? `${c.dataset.label}: $${c.parsed.y.toFixed(1)}M` : null } }
+        legend: {
+          position: 'top', align: 'end',
+          labels: { boxWidth: 12, font: { size: 11, weight: 600 }, padding: 10, usePointStyle: false }
+        },
+        tooltip: {
+          callbacks: {
+            title: items => orgsTop[items[0].dataIndex].org,
+            label: c => c.parsed.x > 0 ? `${c.dataset.label}: $${c.parsed.x.toFixed(1)}M` : null,
+            footer: items => {
+              const total = items.reduce((s,i) => s + i.parsed.x, 0);
+              return 'Total: $' + total.toFixed(1) + 'M';
+            }
+          }
+        }
       },
       scales: {
-        y: { ticks: { callback: v => '$' + v + 'M' }, grid: { color: '#EAE7DD' } },
-        x: { grid: { display: false } }
+        x: {
+          stacked: true,
+          ticks: { callback: v => '$' + v + 'M', font: { size: 11 } },
+          grid: { color: '#EAE7DD' },
+          title: { display: true, text: 'Inversión acumulada (MM CLP)', font: { size: 11, weight: 600 } }
+        },
+        y: {
+          stacked: true,
+          ticks: { font: { size: 11 } },
+          grid: { display: false }
+        }
       }
     }
   });
