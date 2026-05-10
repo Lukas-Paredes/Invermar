@@ -925,6 +925,9 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
   .section-title { font-size: 16px !important; }
   .ficha-hero-title { font-size: 19px !important; }
 }
+
+.ficha-sector-btn.pilot { border-color: var(--green-500); color: var(--green-900); font-weight: 700; }
+.ficha-sector-btn.pilot:not(.active) { background: var(--green-50); }
 </style>
 </head>
 <body>
@@ -3594,10 +3597,22 @@ function metricColor(v, m) {
 
 function renderFicha() {
   const wrap = $('#ficha-selector'); if (!wrap) return;
-  if (!state.fichaSector) state.fichaSector = (DATA.censo_full && DATA.censo_full[0]) ? DATA.censo_full[0].sector : null;
-  const sectores = (DATA.censo_full || []).map(c => c.sector).sort();
+  // Sectores piloto primero, luego resto alfabético, excluyendo ruido
+  const noiseSet = new Set(['Indeterminada']);
+  const allSectors = (DATA.censo_full || []).map(c => c.sector).filter(s => !noiseSet.has(s));
+  const pilotos = ['Aucha','Aguantao','Peñasmo','Huapi Abtao','Colaco','Avellanal','Chayahué','El Dao','Pargua'];
+  const pilotosFound = pilotos.filter(p => allSectors.includes(p));
+  const otros = allSectors.filter(s => !pilotos.includes(s)).sort();
+  const sectores = [...pilotosFound, ...otros];
+  // Default: Aucha (sector más relevante)
+  if (!state.fichaSector || !allSectors.includes(state.fichaSector)) {
+    state.fichaSector = sectores.includes('Aucha') ? 'Aucha' : sectores[0];
+  }
   wrap.innerHTML = `<span class="ficha-selector-label">Sector</span>` +
-    sectores.map(s => `<button class="ficha-sector-btn ${s === state.fichaSector ? 'active' : ''}" onclick="selectFichaSector('${s.replace(/'/g,'')}')">${s}</button>`).join('');
+    sectores.map(s => {
+      const isPilot = pilotos.includes(s);
+      return `<button class="ficha-sector-btn ${s === state.fichaSector ? 'active' : ''} ${isPilot ? 'pilot' : ''}" onclick="selectFichaSector('${s.replace(/'/g,'')}')">${s}${isPilot ? ' ★' : ''}</button>`;
+    }).join('');
   renderFichaContent();
 }
 
@@ -3607,6 +3622,9 @@ function selectFichaSector(s) {
 }
 
 function renderFichaContent() {
+  // Helper defensivo
+  const safeFixed = (v, n=1) => (v != null && !isNaN(v)) ? Number(v).toFixed(n) : '0';
+
   const wrap = $('#ficha-content'); if (!wrap) return;
   const s = (DATA.censo_full || []).find(c => c.sector === state.fichaSector);
   if (!s) { wrap.innerHTML = '<div class="info-note warn">No hay datos para este sector.</div>'; return; }
@@ -3621,7 +3639,7 @@ function renderFichaContent() {
     <div class="ficha-hero">
       <div class="ficha-hero-eyebrow">Calbuco · Los Lagos · Censo INE 2024</div>
       <div class="ficha-hero-title">${escapeHtml(s.sector)}</div>
-      <div class="ficha-hero-sub">${s.pob.toFixed(0)} habitantes · ${s.n_hog.toFixed(0)} hogares · ${s.n_hombres.toFixed(0)}♂ / ${s.n_mujeres.toFixed(0)}♀</div>
+      <div class="ficha-hero-sub">${s.pob.toFixed(0)} habitantes · ${s.n_hog.toFixed(0)} hogares · ${(s.pob_h||0).toFixed(0)}♂ / ${(s.pob_m||0).toFixed(0)}♀</div>
       <div class="ficha-hero-stats">
         <div><div class="ficha-hero-stat-label">Inversión INVERMAR</div><div class="ficha-hero-stat-val">${fmtCLP(invTotal)}</div></div>
         <div><div class="ficha-hero-stat-label">Iniciativas</div><div class="ficha-hero-stat-val">${nIniciativas}</div></div>
