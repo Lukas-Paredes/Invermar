@@ -972,7 +972,6 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
   border-color: var(--navy-700);
 }
 
-/* Tooltips del choropleth (al hover) */
 .sector-tooltip {
   background: white !important;
   border: 1px solid var(--warm-400) !important;
@@ -991,38 +990,24 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
   color: white !important;
   font-weight: 700 !important;
 }
-.sector-tooltip::before {
-  display: none !important;
-}
-/* Quitar el triangulito ya que ahora es flotante */
-.leaflet-tooltip-top:before {
-  border-top-color: var(--warm-400) !important;
-}
-.sector-tooltip.pilot.leaflet-tooltip-top:before {
-  border-top-color: var(--green-700) !important;
-}
+.sector-tooltip::before { display: none !important; }
+.leaflet-tooltip-top:before { border-top-color: var(--warm-400) !important; }
+.sector-tooltip.pilot.leaflet-tooltip-top:before { border-top-color: var(--green-700) !important; }
 
-/* Lista lateral de sectores piloto sobre el choropleth */
 .pilot-list-overlay {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 1000;
+  position: absolute; top: 14px; right: 14px; z-index: 1000;
   background: rgba(255,255,255,0.96);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border-radius: 8px;
-  padding: 10px 14px;
+  border-radius: 8px; padding: 10px 14px;
   box-shadow: 0 4px 16px rgba(15,30,51,0.12);
-  min-width: 180px;
-  max-width: 220px;
+  min-width: 180px; max-width: 220px;
   border: 1px solid var(--warm-300);
 }
 @media (max-width: 768px) {
   .pilot-list-overlay {
     position: relative !important;
-    top: auto !important;
-    right: auto !important;
+    top: auto !important; right: auto !important;
     margin: 12px 12px 0;
     max-width: none;
   }
@@ -1047,7 +1032,7 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
 <!-- ============== TOPBAR ============== -->
 <header class="topbar">
   <div class="topbar-titles">
-    <div class="topbar-eyebrow">Diagnóstico Territorial Final · Calbuco · 2022–2025 · v6.0</div>
+    <div class="topbar-eyebrow">Diagnóstico Territorial Final · Calbuco · 2022–2025 · v6.5</div>
     <div class="topbar-title">INVERMAR · Sistema de Información Territorial</div>
   </div>
   <div class="topbar-stats">
@@ -1160,6 +1145,18 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
     </div>
     <div class="card-body">
       <div id="resumen-pipeline"></div>
+    </div>
+  </div>
+
+  <!-- Inversión por tipo de organización (NUEVO desde diagnóstico final) -->
+  <div class="card mb-16">
+    <div class="card-head">
+      <div class="card-eyebrow">DESTINO DE LA INVERSIÓN</div>
+      <div class="card-title">¿A quién va el dinero? · Distribución por tipo de organización</div>
+      <div class="card-sub">Las escuelas reciben más del tercio del total · Sindicato Los Cisnes solo concentra el 26% por sí solo</div>
+    </div>
+    <div class="card-body">
+      <div id="inv-by-type-bars"></div>
     </div>
   </div>
 
@@ -1788,6 +1785,10 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
     "INVERMAR trajo el modelo de vinculación comunitaria al territorio. Las otras empresas se cerraron."
     <small>CARLOS PEÑALVA · APR AUCHA NORTE + CONSEJO RESOLUTIVO SALUD</small>
   </div>
+  <div class="quote" style="border-left-color:var(--red-700);">
+    "Era un negocio redondo para uno solo."
+    <small>PRESIDENTE SINDICATO LOS CISNES · SOBRE EL ECMPO DE SANDRA DÍAZ — TENSIÓN LATENTE ENTRE C.I. ADUEN DEL DAO Y EL SINDICATO PESQUERO</small>
+  </div>
 
   <h3 style="margin: 24px 0 12px; font-family: var(--font-serif); font-size: 18px; color: var(--navy-800);">Actores estratégicos identificados</h3>
   <div class="grid g-3" id="actores-list"></div>
@@ -2165,6 +2166,34 @@ function getFilteredOrgs() {
 }
 
 // ============== RESUMEN EJECUTIVO ==============
+function renderInvByType() {
+  const wrap = $('#inv-by-type-bars'); if (!wrap) return;
+  // Datos finales del Excel
+  const data = [
+    { tipo: 'Escuela / Liceo', monto: 48359265, pct: 34.6, obs: 'Mayor beneficiario · Nota 6.2/7' },
+    { tipo: 'Sindicato de Pescadores', monto: 36587328, pct: 26.2, obs: 'Sindicato Los Cisnes: $33M en 9 transacciones' },
+    { tipo: 'Comunidad Indígena', monto: 11820780, pct: 8.5, obs: 'C.I. Aduen del Dao, Arkén, Los Aborígenes' },
+    { tipo: 'Comité de Trabajo', monto: 8596881, pct: 6.1, obs: 'APR Aucha Norte + otros comités' },
+    { tipo: 'Fundación / ONG', monto: 8582312, pct: 6.1, obs: 'Parque Edison, Juan David Lemus, Andes Sur' },
+    { tipo: 'Junta de Vecinos', monto: 6946963, pct: 5.0, obs: 'JJVV de todos los sectores' },
+    { tipo: 'Otro', monto: 6774371, pct: 4.8, obs: 'Categorías no clasificadas' },
+    { tipo: 'Persona Natural', monto: 5106447, pct: 3.7, obs: 'Vecinos individuales, emprendedores' },
+    { tipo: 'Agrupación de Emprendedores', monto: 2832212, pct: 2.0, obs: 'Feria El Progreso, Agro Api, Los Pinos' },
+    { tipo: 'Institución Pública', monto: 2478010, pct: 1.8, obs: 'Municipalidad, bomberos' },
+    { tipo: 'Club Deportivo', monto: 1723861, pct: 1.2, obs: 'Clubes deportivos varios' }
+  ];
+  const max = data[0].monto;
+  const colors = ['#2C7A5A','#C54A2A','#1A2F4A','#5A8AAD','#B5947A','#7E94AB','#9A9A95','#6B7F95','#9B7F6B','#4A5E7A','#7A7A75'];
+  wrap.innerHTML = data.map((d, i) => {
+    const w = (d.monto / max) * 100;
+    return `<div style="display:grid;grid-template-columns:200px 1fr 140px;gap:12px;align-items:center;padding:8px 0;font-size:12px;border-bottom:1px solid var(--warm-100);">
+      <div style="font-weight:600;color:var(--navy-800);">${escapeHtml(d.tipo)}<div style="font-size:10px;color:var(--gray-500);font-weight:400;margin-top:2px;line-height:1.3;">${escapeHtml(d.obs)}</div></div>
+      <div style="background:var(--warm-300);height:18px;border-radius:3px;overflow:hidden;"><div style="height:100%;background:${colors[i]};width:${w}%;border-radius:3px;transition:width 0.6s;"></div></div>
+      <div style="text-align:right;font-family:var(--font-serif);font-weight:700;color:var(--navy-800);">${fmtCLP(d.monto)} <span style="font-size:10px;color:var(--gray-500);font-weight:400;">${d.pct}%</span></div>
+    </div>`;
+  }).join('');
+}
+
 function renderResumen() {
   const filtered = getFilteredBBDD();
   const total = filtered.reduce((s,r) => s + r.monto, 0);
@@ -2192,6 +2221,7 @@ function renderResumen() {
   renderResumenCategoriaChart(filtered);
   renderResumenInsights(filtered);
   renderResumenPipeline(filtered);
+  renderInvByType();
 }
 
 function renderResumenSectorBars(filtered) {
@@ -3290,9 +3320,7 @@ function renderChoropleth() {
     onEachFeature: (f, layer) => {
       const s = f.properties;
       const val = (s[varDef.key] !== undefined && s[varDef.key] !== null) ? varDef.fmt(s[varDef.key]) + varDef.unit : 'sin dato';
-      // Tooltips: NUNCA permanentes (causaban overlap en sectores piloto).
-      // Solo al hover, posicionados arriba del polígono.
-      // El sector piloto se identifica con clase especial.
+      // Tooltips: nunca permanentes, solo al hover (los permanentes se amontonaban)
       layer.bindTooltip(s.sector, {
         permanent: false,
         direction: 'top',
@@ -3331,7 +3359,6 @@ function renderChoropleth() {
 }
 
 function renderPilotList() {
-  // Lista lateral con los 9 sectores piloto sobre el mapa
   let wrap = document.getElementById('pilot-list-overlay');
   if (!wrap) return;
   const piloto = [...PILOT_SECTORS];
@@ -3594,7 +3621,7 @@ function renderActores() {
   const wrap = $('#actores-list'); if (!wrap) return;
   const actores = [
     { name: 'Sandra Díaz', role: 'Presidenta · C.I. Aduen del Dao (El Dao / San Rafael)', desc: 'Actor MÁS ESTRATÉGICO del territorio. Controla ECMPO 8.500 há (INVERMAR necesitó la desafectación). Lidera mesa multiempresa con 5 salmoneras y 3 comunidades. Empresa comunitaria PSK en desarrollo. Red de inteligencia territorial activa: "Se mueve una piedra y a mí me avisan". Demanda activa contra Marifa por fugas de amoníaco.', tags: [['Estratégica','green'],['ECMPO 8.500 há','navy'],['Mesa multiempresa','green'],['Demanda activa','red']] },
-    { name: 'Carlos Peñalva', role: 'Presidente · APR Aucha Norte + Consejo Resolutivo Salud "Entre Ríos"', desc: 'Actor con DOBLE ROL territorial — mayor cobertura del análisis (Cárdena a Colaco, 4 postas). APR co-fundado por INVERMAR ($60M en estudios técnicos). 3 años trabado en SAG. Propuso a Miguel Morales que INVERMAR sea NEXO con otras salmoneras (Camanchaca, Cargill, Cermaq). No pidió dinero — pidió articulación.', tags: [['Articulador','green'],['APR co-fundado','orange'],['Consejo Resolutivo Salud','navy'],['Propone nexo','green']] },
+    { name: 'Carlos Peñalva', role: 'Presidente · APR Aucha Norte + Consejo Resolutivo Salud "Entre Ríos"', desc: 'Actor con DOBLE ROL territorial — mayor cobertura del análisis (Cárdena a Colaco, 4 postas). APR co-fundado por INVERMAR · 67 familias inscritas (~50 activas) · $60M en estudios técnicos entre Aucha Norte + Fundo San Lorenzo · 3 años trabado en SAG. Propuso a Miguel Morales que INVERMAR sea NEXO con otras salmoneras (Camanchaca, Cargill, Cermaq). No pidió dinero — pidió articulación.', tags: [['Articulador','green'],['APR co-fundado','orange'],['Consejo Resolutivo Salud','navy'],['Propone nexo','green']] },
     { name: 'María Otey', role: 'TENS encargada · Posta Rural Aguantao · 35 años de servicio', desc: 'Voz INSTITUCIONAL más honesta del territorio. Cubre Aucha, Aguantao y El Dao. Valora el internet satelital donado por INVERMAR como el apoyo de mayor impacto relativo. Crítica directa: "La empresa se ve muy lejana — cerraron puertas con el tiempo". Verifica el conformismo cultural: "Los vecinos no reclaman por miedo". Propone fondo concursable $10M, mesa territorial periódica y mapa georreferenciado.', tags: [['Institucional-crítica','orange'],['35 años territorio','navy'],['Propone fondo $10M','green'],['Verifica conformismo','red']] },
     { name: 'Eudomilia Villegas', role: 'Presidenta · C.I. Arkén (Aucha) — CASO MÁS URGENTE', desc: 'Comunidad más expuesta a impactos operacionales. ⚠ FIRMA SIN CONSENTIMIENTO INFORMADO — riesgo legal ESG ACTIVO. 8 problemas operacionales sin resolver: ruido nocturno, tubo en playa, contaminación percibida, ruka no construida, PYME lavandería fallida. La C.I. Arkén fue la única que NO respondió la encuesta — el silencio es un dato analítico.', tags: [['CRÍTICO','red'],['8 problemas activos','red'],['Riesgo ESG','red'],['12 familias','navy']] },
     { name: 'María Ester Guerrero Reyes', role: 'Presidenta · C.I. Los Aborígenes (Huapi Abtao)', desc: 'Comunidad con ECMPO en trámite. 14 socios. Nota 7/7 en encuesta. Sin apoyo cultural recibido jamás. No sabe postular fondos públicos. Contraste con JJVV Huapi (2.7/7) en la misma isla — son actores distintos.', tags: [['Emergente','green'],['ECMPO en trámite','navy'],['Nota 7/7','green'],['Sin apoyo cultural','orange']] },
@@ -3603,7 +3630,7 @@ function renderActores() {
     { name: 'Bárbara Chavez', role: 'Presidenta · JJVV N°9 Aguantao', desc: 'Nota 6.3/7. Preferencia de gobernanza: "que nos pasen el dinero en base a cotizaciones y rendimos con boletas". Modelo distinto al de Huapi (materiales directos) — indica confianza en capacidad administrativa propia. Demanda: asesoría técnica en diseño, regularización y formulación de proyectos.', tags: [['Funcional-personalizada','orange'],['Quiere dinero+boletas','navy'],['Asesoría técnica','green']] },
     { name: 'Juan Emerson Soto Vargas', role: 'Presidente · JJVV N°39 El Dao (NUEVO en el análisis)', desc: 'Nota 6.3/7. El Dao es el ÚNICO sector sin sede comunitaria propia — prioridad #1. Caminos 1/5, conectividad 1/5. Demanda explícita: "más trabajo para las personas del sector, que se ocupe más mano de obra".', tags: [['Sin sede comunitaria','red'],['NUEVO en análisis','navy'],['Pide empleo local','orange']] },
     { name: 'Raquel', role: 'APR Aucha Norte · Única prestadora aseo del sector en INVERMAR', desc: 'Articula la CRÍTICA MÁS ESTRUCTURADA del análisis: "La mayoría de las inversiones son cosas PARA la comunidad, pero no cosas CON la comunidad". Trabaja como prestadora externa sin antigüedad, sin vínculo laboral directo. Ejemplo del modelo laboral precario que critican múltiples actores.', tags: [['Cita estructural','green'],['Modelo laboral precario','red']] },
-    { name: 'Sindicato Los Cisnes', role: 'Único sindicato pesquero · Aucha-Aguantao-Colaco · 18 socios', desc: 'MAYOR beneficiario del período: $33M acumulados. Convenio paso marítimo $10M/año por 10 años — el presidente actual considera el monto SUBVALUADO ("INVERMAR paga $20M por arrendar un barco en una sola operación"). Vence en ~7 años — hito crítico. Sin SII no puede postular al Fondo Concursable.', tags: [['$33M sin trazabilidad','orange'],['Convenio subvaluado','red'],['Vence ~7 años','navy'],['Sin SII','orange']] },
+    { name: 'Sindicato Los Cisnes', role: 'Único sindicato pesquero · Aucha-Aguantao-Colaco · 18 socios', desc: 'MAYOR beneficiario del período: $33M acumulados · 18 socios activos (mayoría 65+, sin relevo generacional) · Concesión 14 há solo algas · Convenio paso marítimo $10M/año por 10 años — el presidente actual considera el monto SUBVALUADO ("INVERMAR paga $20M por arrendar un barco en una sola operación"). Vence en ~7 años — hito crítico. Sin SII no puede postular al Fondo Concursable.', tags: [['$33M sin trazabilidad','orange'],['Convenio subvaluado','red'],['Vence ~7 años','navy'],['Sin SII','orange']] },
     { name: 'Roxana Oyarzún', role: 'Directora · Escuela Rural Peñasmo', desc: 'Interlocutora principal con la ESCUELA DE MEJOR EVALUACIÓN del territorio (7/7). Presencia INVERMAR en todas las actividades del año. Talleres de educación ambiental, compost, abono. Apoyo a licenciaturas. Punto verde inaugurado el 20 abril 2026.', tags: [['Colaborativa estable','green'],['Nota 7/7','green'],['Punto verde ✅','green']] }
   ];
   wrap.innerHTML = actores.map(a => `
