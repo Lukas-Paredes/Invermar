@@ -971,6 +971,62 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
   color: white;
   border-color: var(--navy-700);
 }
+
+/* Tooltips del choropleth (al hover) */
+.sector-tooltip {
+  background: white !important;
+  border: 1px solid var(--warm-400) !important;
+  color: var(--navy-800) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 5px 10px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 12px rgba(15,30,51,0.18) !important;
+  white-space: nowrap !important;
+}
+.sector-tooltip.pilot {
+  background: var(--green-700) !important;
+  border-color: var(--green-700) !important;
+  color: white !important;
+  font-weight: 700 !important;
+}
+.sector-tooltip::before {
+  display: none !important;
+}
+/* Quitar el triangulito ya que ahora es flotante */
+.leaflet-tooltip-top:before {
+  border-top-color: var(--warm-400) !important;
+}
+.sector-tooltip.pilot.leaflet-tooltip-top:before {
+  border-top-color: var(--green-700) !important;
+}
+
+/* Lista lateral de sectores piloto sobre el choropleth */
+.pilot-list-overlay {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1000;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 16px rgba(15,30,51,0.12);
+  min-width: 180px;
+  max-width: 220px;
+  border: 1px solid var(--warm-300);
+}
+@media (max-width: 768px) {
+  .pilot-list-overlay {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    margin: 12px 12px 0;
+    max-width: none;
+  }
+}
 </style>
 </head>
 <body>
@@ -1565,6 +1621,7 @@ main { padding: 24px 28px 60px; max-width: 1600px; }
     <div style="position:relative;">
       <div id="map-choropleth"></div>
       <div class="choropleth-legend" id="choropleth-legend"></div>
+      <div id="pilot-list-overlay" class="pilot-list-overlay"></div>
     </div>
   </div>
 
@@ -3233,15 +3290,16 @@ function renderChoropleth() {
     onEachFeature: (f, layer) => {
       const s = f.properties;
       const val = (s[varDef.key] !== undefined && s[varDef.key] !== null) ? varDef.fmt(s[varDef.key]) + varDef.unit : 'sin dato';
-      // Tooltip permanente solo en piloto si estamos en modo 'pilot', si no a todos
-      // En mobile, NUNCA permanente (los tooltips se amontonan en pantallas chicas)
-      const isMobile = window.innerWidth <= 768;
-      const showPermanent = !isMobile && (state.choroplethScope === 'all' || PILOT_SECTORS.has(s.sector));
-      if (showPermanent) {
-        layer.bindTooltip(s.sector, { permanent: true, direction: 'center', className: PILOT_SECTORS.has(s.sector) ? 'sector-tooltip pilot' : 'sector-tooltip' });
-      } else {
-        layer.bindTooltip(s.sector, { permanent: false, direction: 'top', className: 'sector-tooltip' });
-      }
+      // Tooltips: NUNCA permanentes (causaban overlap en sectores piloto).
+      // Solo al hover, posicionados arriba del polígono.
+      // El sector piloto se identifica con clase especial.
+      layer.bindTooltip(s.sector, {
+        permanent: false,
+        direction: 'top',
+        sticky: true,
+        className: PILOT_SECTORS.has(s.sector) ? 'sector-tooltip pilot' : 'sector-tooltip',
+        offset: [0, -8]
+      });
       layer.bindPopup(`
         <div style="min-width:220px;font-family:Inter,sans-serif;">
           <b style="font-size:14px;color:#0F1E33;">${escapeHtml(s.sector)}</b>
@@ -3269,6 +3327,42 @@ function renderChoropleth() {
     choroplethMap._fitBoundsDone = true;
   }
   renderChoroplethLegend(varDef, min, max);
+  renderPilotList();
+}
+
+function renderPilotList() {
+  // Lista lateral con los 9 sectores piloto sobre el mapa
+  let wrap = document.getElementById('pilot-list-overlay');
+  if (!wrap) return;
+  const piloto = [...PILOT_SECTORS];
+  const sectoresPiloto = piloto.map(name => {
+    const s = DATA.sectores_poly.find(p => p.sector === name);
+    return s ? { name, ivc: s.ivc || 0, inv_mm: s.inv_mm || 0 } : null;
+  }).filter(Boolean).sort((a,b) => b.ivc - a.ivc);
+  wrap.innerHTML = `
+    <div style="font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--gray-500);text-transform:uppercase;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--warm-200);">9 SECTORES PILOTO</div>
+    ${sectoresPiloto.map(s => `
+      <div onclick="zoomToSector('${s.name.replace(/'/g,'')}')" style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;cursor:pointer;font-size:11px;border-bottom:1px solid var(--warm-100);" onmouseover="this.style.background='var(--warm-100)'" onmouseout="this.style.background='transparent'">
+        <span style="color:var(--navy-800);font-weight:600;">${escapeHtml(s.name)}</span>
+        <span style="font-variant-numeric:tabular-nums;color:var(--gray-500);">${s.ivc.toFixed(0)}</span>
+      </div>
+    `).join('')}
+    <div style="font-size:9px;color:var(--gray-500);margin-top:6px;padding-top:4px;text-align:right;">Click para acercar · valor = IVC</div>
+  `;
+}
+
+function zoomToSector(sectorName) {
+  if (!choroplethMap || !choroplethLayer) return;
+  let foundLayer = null;
+  choroplethLayer.eachLayer(layer => {
+    if (layer.feature && layer.feature.properties.sector === sectorName) {
+      foundLayer = layer;
+    }
+  });
+  if (foundLayer) {
+    choroplethMap.fitBounds(foundLayer.getBounds(), { padding: [60, 60], maxZoom: 14 });
+    setTimeout(() => foundLayer.openPopup(), 400);
+  }
 }
 
 function renderChoroplethLegend(varDef, min, max) {
