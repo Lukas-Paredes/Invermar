@@ -2932,20 +2932,52 @@ function makeMarkerIcon(tipo, monto, isRef, isOutOfFilter) {
   });
 }
 
+// Sincronizar montos del mapa con la BBDD viva
+// (los puntos del mapa tienen montos hardcoded desactualizados — los actualizamos
+// con los totales reales calculados desde DATA.bbdd)
+function syncMapMontosWithBBDD() {
+  if (!DATA.mapa || !DATA.bbdd) return;
+  // Agrupar totales por organización (case-insensitive)
+  const totalsByOrg = {};
+  DATA.bbdd.forEach(r => {
+    const key = (r.org || '').toLowerCase().trim();
+    if (!key) return;
+    if (!totalsByOrg[key]) totalsByOrg[key] = 0;
+    totalsByOrg[key] += (r.monto || 0);
+  });
+  // Aplicar SOLO al primer punto por org para evitar duplicar el monto
+  // cuando hay múltiples puntos del misma org en el mapa
+  const seen = new Set();
+  DATA.mapa.forEach(p => {
+    if (p.tipo === 'Planta operaciones') return;
+    const key = (p.org || '').toLowerCase().trim();
+    if (key in totalsByOrg && !seen.has(key)) {
+      p.monto = totalsByOrg[key];
+      seen.add(key);
+    } else if (seen.has(key)) {
+      // ya asignamos a otro punto de la misma org, este queda como referencial
+      p.monto = 0;
+    }
+  });
+}
+
 function renderMapKPIs() {
+  syncMapMontosWithBBDD();
   const all = DATA.mapa.filter(p => p.tipo !== 'Planta operaciones');
   const withInv = all.filter(p => p.monto > 0);
   const tipos = new Set(all.map(p => p.tipo));
   const distProm = all.length ? all.reduce((s,p) => s + (parseFloat(p.dist_planta) || 0), 0) / all.length : 0;
+  const totalReal = withInv.reduce((s,p) => s + (p.monto || 0), 0);
   if ($('#mapa-stat-puntos')) $('#mapa-stat-puntos').textContent = all.length;
   if ($('#mapa-stat-puntos-sub')) $('#mapa-stat-puntos-sub').textContent = all.length + ' organizaciones ubicadas';
   if ($('#mapa-stat-inv')) $('#mapa-stat-inv').textContent = withInv.length;
-  if ($('#mapa-stat-inv-sub')) $('#mapa-stat-inv-sub').textContent = (all.length ? Math.round(withInv.length/all.length*100) : 0) + '% del total';
+  if ($('#mapa-stat-inv-sub')) $('#mapa-stat-inv-sub').textContent = (all.length ? Math.round(withInv.length/all.length*100) : 0) + '% georreferenciado · ' + fmtCLP(totalReal);
   if ($('#mapa-stat-dist')) $('#mapa-stat-dist').textContent = distProm.toFixed(1) + ' km';
   if ($('#mapa-stat-tipos')) $('#mapa-stat-tipos').textContent = tipos.size;
 }
 
 function renderMapRanking() {
+  syncMapMontosWithBBDD();
   const wrap = $('#mapa-ranking'); if (!wrap) return;
   const all = DATA.mapa.filter(p => p.tipo !== 'Planta operaciones');
   const bySector = {};
@@ -3040,6 +3072,7 @@ function setMapMode(m) { state.mapMode = m; renderMapMarkers(); }
 
 function renderMapMarkers() {
   if (!mapInstance) return;
+  syncMapMontosWithBBDD();
   mapMarkers.forEach(m => mapInstance.removeLayer(m));
   mapMarkers = [];
   const filtered = DATA.mapa.filter(p => {
@@ -3079,7 +3112,10 @@ function renderMapMarkers() {
   });
 
   const real = filtered.filter(p => p.monto > 0);
-  $('#map-info-text').textContent = `${real.length} con inversión · ${fmtCLP(real.reduce((s,p)=>s+p.monto,0))} · ${filtered.length - real.length} referenciales`;
+  const totalMapa = real.reduce((s,p)=>s+p.monto,0);
+  const totalBBDD = (DATA.bbdd || []).reduce((s,r)=>s+(r.monto||0),0);
+  const georefPct = totalBBDD ? Math.round(totalMapa/totalBBDD*100) : 0;
+  $('#map-info-text').textContent = `${real.length} con inversión · ${fmtCLP(totalMapa)} (${georefPct}% del total) · ${filtered.length - real.length} referenciales`;
 }
 
 // ============== CHOROPLETH ==============
