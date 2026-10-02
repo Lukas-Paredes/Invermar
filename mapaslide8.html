@@ -228,7 +228,7 @@ const TOP = [{"org": "Sindicato de Pescadores Los Cisnes de Aucha Aguantao", "ti
 const TIPO_COLOR = {"Escuela/Liceo": {"abbr": "E", "color": "#2C7A5A"}, "Comunidad Indígena": {"abbr": "CI", "color": "#C54A2A"}, "Junta de Vecinos": {"abbr": "JV", "color": "#243C5A"}, "Sindicato de Pescadores": {"abbr": "S", "color": "#A32D2D"}, "Comité de Trabajo": {"abbr": "CT", "color": "#7AC4A0"}, "Agrupación de Emprendedores": {"abbr": "AE", "color": "#9B7F6B"}, "Club Deportivo": {"abbr": "CD", "color": "#E37050"}, "Fundación/ONG": {"abbr": "F", "color": "#6B5E8A"}, "Institución Pública": {"abbr": "IP", "color": "#3D5A7F"}};
 
 const map = L.map('map', {zoomControl:false, preferCanvas:false, zoomSnap:0.25}).setView([-41.762,-73.32], 12);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:18}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {attribution:'© Esri', maxZoom:19}).addTo(map);
 
 SECTORES.filter(s => PILOTO.includes(s.sector)).forEach(s => {
   L.geoJSON({type:"Feature", properties:s, geometry:s.geometry}, {

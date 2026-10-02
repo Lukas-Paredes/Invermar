@@ -3000,10 +3000,51 @@ function renderMapRanking() {
   }).join('');
 }
 
+// ============== BASEMAP ==============
+// Esri: infraestructura institucional, sin API key, no exige Referer.
+// Funciona con doble click (file://). Si cae, salta al siguiente.
+const BASEMAPS = {
+  calles: [
+    { url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      opts:{ maxZoom:19, attribution:'&copy; Esri' } },
+    { url:'https://tile.openstreetmap.de/{z}/{x}/{y}.png',
+      opts:{ maxZoom:18, attribution:'&copy; OpenStreetMap' } }
+  ],
+  gris: [
+    { url:'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+      opts:{ maxNativeZoom:16, maxZoom:18, attribution:'&copy; Esri' } },
+    { url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      opts:{ maxZoom:19, attribution:'&copy; Esri' } }
+  ]
+};
+
+function addBasemap(map, perfil) {
+  const lista = BASEMAPS[perfil] || BASEMAPS.calles;
+  let i = 0, capa = null;
+  function montar() {
+    if (i >= lista.length) return;
+    const def = lista[i];
+    capa = L.tileLayer(def.url, def.opts);
+    let errores = 0, cambiado = false;
+    capa.on('tileerror', () => {
+      if (cambiado) return;
+      if (++errores >= 4 && i < lista.length - 1) {
+        cambiado = true;
+        console.warn('Basemap sin respuesta, cambiando al siguiente:', def.url);
+        map.removeLayer(capa);
+        i++; montar();
+      }
+    });
+    capa.addTo(map);
+  }
+  montar();
+  return () => capa;
+}
+
 function initMap() {
   if (mapInstance) return;
   mapInstance = L.map('map-leaflet', { scrollWheelZoom: true }).setView([-41.77, -73.32], 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 18 }).addTo(mapInstance);
+  addBasemap(mapInstance, 'calles');
 
   // Planta
   const plantaIcon = L.divIcon({
@@ -3295,7 +3336,7 @@ function getChoroplethColor(val, min, max, invert) {
 function initChoropleth() {
   if (choroplethMap) return;
   choroplethMap = L.map('map-choropleth', { scrollWheelZoom: false }).setView([-41.85, -73.30], 11);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 18 }).addTo(choroplethMap);
+  addBasemap(choroplethMap, 'gris');
 
   const plantaIcon = L.divIcon({
     html: `<div style="position:relative;display:flex;flex-direction:column;align-items:center;">

@@ -81,7 +81,7 @@ const PLANTA = {"lat": -41.7698062, "lng": -73.3316408};
 const TIPO_COLOR = {"Escuela/Liceo": "#2C7A5A", "Comunidad Indígena": "#C54A2A", "Junta de Vecinos": "#243C5A", "Sindicato de Pescadores": "#A32D2D", "Comité de Trabajo": "#7AC4A0", "Agrupación de Emprendedores": "#9B7F6B", "Institución Pública": "#3D5A7F"};
 
 const map = L.map('map', {zoomControl: false, attributionControl: true, preferCanvas: false, zoomSnap: 0.25, zoomDelta: 0.25}).setView([-41.770, -73.31], 14);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap', maxZoom: 18}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {attribution: '© Esri', maxZoom: 19}).addTo(map);
 
 // Sectores Aucha + Aguantao
 SECTORES.filter(s => ["Aguantao", "Aucha"].includes(s.sector)).forEach(s => {

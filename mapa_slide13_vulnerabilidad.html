@@ -210,9 +210,9 @@ const map = L.map('map', {
   preferCanvas: false
 }).setView([-41.762, -73.32], 12);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap',
-  maxZoom: 18
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+  attribution: '© Esri',
+  maxNativeZoom: 16, maxZoom: 18
 }).addTo(map);
 
 // Render TODOS los sectores (40), pero piloto resaltados

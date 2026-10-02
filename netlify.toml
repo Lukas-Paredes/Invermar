@@ -1,0 +1,35 @@
+[build]
+  publish = "."
+
+# La raíz del sitio sirve el dashboard final.
+# status = 200 es rewrite: la URL queda limpia, sin /dashboardfinal.html a la vista.
+# force = true hace que gane por sobre el index.html que ya existe en el repo.
+# Si en algún momento quieres que la raíz vuelva a mostrar index.html, borra este bloque.
+[[redirects]]
+  from = "/"
+  to = "/dashboardfinal.html"
+  status = 200
+  force = true
+
+# Atajos cómodos para mandar por correo
+[[redirects]]
+  from = "/movil"
+  to = "/dashboard-mobilefinal.html"
+  status = 200
+
+[[redirects]]
+  from = "/vulnerabilidad"
+  to = "/mapa_slide13_vulnerabilidad.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Los HTML se revalidan siempre, así un redeploy se ve al tiro
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

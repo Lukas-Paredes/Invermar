@@ -279,7 +279,7 @@ function addSectorLabelSimple(map, s) {
 }
 
 const map = L.map('map', {zoomControl: true, preferCanvas: false}).setView([-41.770, -73.31], 14);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap', maxZoom: 18}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {attribution: '© Esri', maxZoom: 19}).addTo(map);
 
 // Both sectors with equal weight
 SECTORES.filter(s => ["Aguantao", "Aucha"].includes(s.sector)).forEach(s => {
